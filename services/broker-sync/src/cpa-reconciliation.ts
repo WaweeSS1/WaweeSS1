@@ -1,5 +1,5 @@
-import { PrismaClient } from "@fxking/db";
-import { COMPLIANCE } from "@fxking/shared";
+import { PrismaClient } from "@rebound/db";
+import { COMPLIANCE } from "@rebound/shared";
 import { verifyMtFtd, type MtPlatform } from "./adapters/mt-manager";
 
 const prisma = new PrismaClient();

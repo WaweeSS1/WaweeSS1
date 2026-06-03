@@ -1,9 +1,9 @@
-# Render Blueprint — FX·King backend (api + bot + broker-sync).
+# Render Blueprint — Rebound backend (api + bot + broker-sync).
 # DB = Neon (external), Redis = Upstash (external); both referenced via env.
 # Deploy: Render dashboard → New → Blueprint → point at this repo.
 services:
   - type: web
-    name: fxking-api
+    name: rebound-api
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
@@ -17,10 +17,10 @@ services:
         value: production
       - key: PORT
         value: "8080"
-      - fromGroup: fxking-shared
+      - fromGroup: rebound-shared
 
   - type: worker
-    name: fxking-bot
+    name: rebound-bot
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
@@ -29,10 +29,10 @@ services:
     envVars:
       - key: SERVICE
         value: bot
-      - fromGroup: fxking-shared
+      - fromGroup: rebound-shared
 
   - type: worker
-    name: fxking-broker-sync
+    name: rebound-broker-sync
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
@@ -41,11 +41,11 @@ services:
     envVars:
       - key: SERVICE
         value: broker-sync
-      - fromGroup: fxking-shared
+      - fromGroup: rebound-shared
 
 # Secrets live in a shared env group (set values in the Render dashboard).
 envVarGroups:
-  - name: fxking-shared
+  - name: rebound-shared
     envVars:
       - key: DATABASE_URL          # Neon pooled URL
       - key: DIRECT_URL            # Neon direct URL (migrations)

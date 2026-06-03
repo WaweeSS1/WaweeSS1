@@ -1,6 +1,6 @@
 import { Bot, InlineKeyboard, webhookCallback } from "grammy";
-import { PrismaClient } from "@fxking/db";
-import { COMPLIANCE } from "@fxking/shared";
+import { PrismaClient } from "@rebound/db";
+import { COMPLIANCE } from "@rebound/shared";
 
 const prisma = new PrismaClient();
 const bot = new Bot(process.env.BOT_TOKEN!);
@@ -34,14 +34,14 @@ bot.command("start", async (ctx) => {
   }
 
   const keyboard = new InlineKeyboard()
-    .webApp("Nyisd meg az FX·King appot", process.env.WEBAPP_URL!)
+    .webApp("Nyisd meg az Rebound appot", process.env.WEBAPP_URL!)
     .row()
     .text("Referral kódom", "referral_code")
     .text("Payout státusz", "payout_status");
 
   await ctx.reply(
     `Üdv, ${tgUser.first_name}!\n\n` +
-    `FX·King — cash rebate a valódi kereskedésedért.\n\n` +
+    `Rebound — cash rebate a valódi kereskedésedért.\n\n` +
     `${COMPLIANCE.RISK_WARNING.SHORT}\n\n` +
     `Tools, not tips.`,
     { reply_markup: keyboard }
@@ -93,7 +93,7 @@ if (useWebhook) {
   // Production: webhook via Fastify or Express
   console.log("Bot running in webhook mode");
 } else {
-  bot.start({ onStart: () => console.log("FX·King bot started (long-polling)") });
+  bot.start({ onStart: () => console.log("Rebound bot started (long-polling)") });
 }
 
 export { bot, webhookCallback };

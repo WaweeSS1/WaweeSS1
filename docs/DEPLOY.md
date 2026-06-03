@@ -1,4 +1,4 @@
-# FX·King — Deploy Guide
+# Rebound — Deploy Guide
 
 > **LAUNCH GATE:** Production launch is blocked until legal validation is complete
 > (see `docs/legal/LEGAL-NOTICE.md`). This guide is the technical path only.
@@ -22,15 +22,15 @@ is portable to **Railway** or **Fly.io** unchanged.
 
 ## 1. Provision data stores (EU region — GDPR)
 
-1. **Neon**: create project `fxking` in `eu-central-1`. Copy the **pooled** URL →
+1. **Neon**: create project `rebound` in `eu-central-1`. Copy the **pooled** URL →
    `DATABASE_URL` and the **direct** URL → `DIRECT_URL`.
 2. **Upstash**: create a Redis DB in an EU region → `REDIS_URL`.
 
 ## 2. Backend (Render)
 
 1. Render → **New → Blueprint** → point at this repo. `render.yaml` provisions
-   `fxking-api` (web) + `fxking-bot` + `fxking-broker-sync` (workers).
-2. Fill the **`fxking-shared`** env group with the values from `.env.example`
+   `rebound-api` (web) + `rebound-bot` + `rebound-broker-sync` (workers).
+2. Fill the **`rebound-shared`** env group with the values from `.env.example`
    (DB, Redis, `BOT_TOKEN`, broker gateway keys, etc.).
 3. First deploy runs `prisma migrate deploy` automatically (api entrypoint).
 4. Health check: `GET /health` on the api service.
@@ -41,12 +41,12 @@ is portable to **Railway** or **Fly.io** unchanged.
 
 ## 3. Frontends
 
-- **Landing (Cloudflare Pages)**: project `fxking-landing`, build
-  `npx turbo run build --filter=@fxking/landing`, output `apps/landing/dist`.
+- **Landing (Cloudflare Pages)**: project `rebound-landing`, build
+  `npx turbo run build --filter=@rebound/landing`, output `apps/landing/dist`.
   Enable "include files outside root" for the monorepo install.
 - **Mini App / Admin (Vercel)**: one project each, **Root Directory** =
   `apps/miniapp` / `apps/admin`, enable **Include source files outside the Root
-  Directory** (needed for `@fxking/shared`). Set `VITE_API_URL` /
+  Directory** (needed for `@rebound/shared`). Set `VITE_API_URL` /
   `VITE_ADMIN_API_URL`. `vercel.json` handles SPA rewrites + headers.
 
 ## 4. CI/CD (GitHub Actions)

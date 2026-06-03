@@ -79,7 +79,7 @@ export function PayoutScreen() {
         </div>
         <div className="risk-box" role="note" style={{ marginBottom: "var(--sp-4)" }}>
           <strong>Ellenőrizd a tárca / IBAN adatokat!</strong>
-          Hibás cím esetén az átutalás visszavonhatatlan lehet. Az FX·King nem vállal felelősséget.
+          Hibás cím esetén az átutalás visszavonhatatlan lehet. Az Rebound nem vállal felelősséget.
         </div>
         <div style={{ display: "flex", gap: "var(--sp-3)" }}>
           <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setStep("form")}>← Vissza</button>

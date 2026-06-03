@@ -25,13 +25,13 @@ jobs:
       - if: steps.guard.outputs.ok == 'true'
         run: npm ci
       - if: steps.guard.outputs.ok == 'true'
-        run: npx turbo run build --filter=@fxking/landing
+        run: npx turbo run build --filter=@rebound/landing
       - if: steps.guard.outputs.ok == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/landing/dist --project-name=fxking-landing
+          command: pages deploy apps/landing/dist --project-name=rebound-landing
 
   miniapp:
     name: Mini App → Vercel

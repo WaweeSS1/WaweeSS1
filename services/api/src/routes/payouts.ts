@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { PrismaClient } from "@fxking/db";
+import { PrismaClient } from "@rebound/db";
 import { z } from "zod";
-import { COMPLIANCE } from "@fxking/shared";
+import { COMPLIANCE } from "@rebound/shared";
 
 const prisma = new PrismaClient();
 

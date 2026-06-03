@@ -125,7 +125,7 @@ export function JournalScreen() {
 
       <div className="risk-box" style={{ marginTop: "var(--sp-3)" }} role="note">
         <strong>Figyelmeztetés</strong>
-        A napló adatait a broker biztosítja — az FX·King nem vállal felelősséget az adatok pontosságáért. Ez nem befektetési tanács.
+        A napló adatait a broker biztosítja — az Rebound nem vállal felelősséget az adatok pontosságáért. Ez nem befektetési tanács.
       </div>
     </div>
   );

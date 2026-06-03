@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
-import { verifyTelegramInitData } from "@fxking/shared";
+import { verifyTelegramInitData } from "@rebound/shared";
 
 const PUBLIC_PATHS = ["/health", "/v1/referrals/validate"];
 

@@ -1,4 +1,4 @@
-# FX·King Launch Checklist
+# Rebound Launch Checklist
 
 > **Státusz-jelölés** · `[x]` kódban implementálva és ellenőrizve ·
 > `[~]` részleges / vázlat (befejezésre vár) · `[ ]` függőben (futásidő / külső /

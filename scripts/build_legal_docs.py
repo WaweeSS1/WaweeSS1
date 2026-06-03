@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-FX·King legal document stub generator.
+Rebound legal document stub generator.
 
 Produces 4 editable .docx drafts in docs/legal/ for lawyer validation:
   1. ASZF (T&C)              2. Adatvedelmi Tajekoztato (GDPR)
@@ -98,22 +98,22 @@ def footer_disclaimer(doc):
 RISK_SHORT = ("A CFD-ek és a forex (deviza) kereskedés magas kockázattal jár, és a "
               "befektetett tőke teljes elvesztésével járhat. A kiskereskedelmi CFD-számlák "
               "[ESMA %]-a veszít pénzt ennél a szolgáltatónál. Ez nem befektetési tanács. "
-              "Az FX·King eszközöket kínál, nem javaslatokat (Tools, not tips).")
+              "Az Rebound eszközöket kínál, nem javaslatokat (Tools, not tips).")
 
 # ════════════════════════════════════════════════════════════════════════════
 # 1 — ÁSZF / T&C
 # ════════════════════════════════════════════════════════════════════════════
 def build_tc():
     doc = base_doc("Általános Szerződési Feltételek (ÁSZF)",
-                   "FX·King — cashback-alapú forex affiliate companion · Telegram Mini App")
+                   "Rebound — cashback-alapú forex affiliate companion · Telegram Mini App")
     placeholder_note(doc)
 
     h2(doc, "1. Bevezetés és a szolgáltatás jellege")
-    para(doc, "1.1. Az FX·King-et a [CÉGNÉV] ([cégjegyzékszám], [székhely]) üzemelteti "
-              "(„Szolgáltató”). Az FX·King egy companion eszköz, amely partner-brokereknél "
+    para(doc, "1.1. Az Rebound-et a [CÉGNÉV] ([cégjegyzékszám], [székhely]) üzemelteti "
+              "(„Szolgáltató”). Az Rebound egy companion eszköz, amely partner-brokereknél "
               "végzett kereskedés után cashback (rebate) visszatérítést és kapcsolódó "
               "eszközöket (napló, kalkulátor, kockázati coach) nyújt.")
-    para(doc, "1.2. Az FX·King NEM broker, NEM befektetési szolgáltató, és NEM ad "
+    para(doc, "1.2. Az Rebound NEM broker, NEM befektetési szolgáltató, és NEM ad "
               "befektetési tanácsot. A kereskedés a partner-broker felületén, a broker "
               "szabályzata szerint történik.", bold=True)
     para(doc, "1.3. A rebate az affiliate jutalék felhasználónak visszaosztott része "
@@ -167,7 +167,7 @@ def build_tc():
 # ════════════════════════════════════════════════════════════════════════════
 def build_gdpr():
     doc = base_doc("Adatvédelmi Tájékoztató (GDPR)",
-                   "FX·King — a természetes személyek adatainak kezeléséről (GDPR 2016/679)")
+                   "Rebound — a természetes személyek adatainak kezeléséről (GDPR 2016/679)")
     placeholder_note(doc)
 
     h2(doc, "1. Adatkezelő")
@@ -213,7 +213,7 @@ def build_gdpr():
 # ════════════════════════════════════════════════════════════════════════════
 def build_risk():
     doc = base_doc("Kockázati Tájékoztató (Risk Disclosure)",
-                   "FX·King — kötelező kockázati közlés minden felületen")
+                   "Rebound — kötelező kockázati közlés minden felületen")
 
     # Big risk box
     t = doc.add_table(rows=1, cols=1); c = t.rows[0].cells[0]; shade(c, "FBE9E7")
@@ -234,7 +234,7 @@ def build_risk():
               "töltendő ki, és rendszeresen frissítendő.)", bold=True)
 
     h2(doc, "3. Tools, not tips — nincs befektetési tanács")
-    para(doc, "Az FX·King eszközöket kínál (kereskedési napló, pozícióméret-kalkulátor, "
+    para(doc, "Az Rebound eszközöket kínál (kereskedési napló, pozícióméret-kalkulátor, "
               "kockázati coach, cashback-követés), NEM befektetési tanácsot, NEM "
               "kereskedési jelzéseket, és NEM hozamígéretet.", bold=True, color=AMBER)
     bullet(doc, "Tilos a „garantált profit”, „kockázatmentes”, „biztos hozam” típusú állítás.")
@@ -243,7 +243,7 @@ def build_risk():
 
     h2(doc, "4. A cashback nem ösztönöz túlkereskedésre")
     para(doc, "A rebate a ténylegesen kereskedett volumen utáni költségvisszatérítés. "
-              "NEM cél a kereskedési gyakoriság növelése. Az FX·King anti-revenge-trading "
+              "NEM cél a kereskedési gyakoriság növelése. Az Rebound anti-revenge-trading "
               "jelzéseket is megjelenít.", color=AMBER)
 
     h2(doc, "5. Megértés visszaigazolása")
@@ -259,13 +259,13 @@ def build_risk():
 # ════════════════════════════════════════════════════════════════════════════
 def build_affiliate():
     doc = base_doc("Affiliate Disclosure (Partneri Közlés)",
-                   "FX·King — az FX·King és a partner-broker viszonyának átlátható közlése")
+                   "Rebound — az Rebound és a partner-broker viszonyának átlátható közlése")
     placeholder_note(doc)
 
     h2(doc, "1. Egyértelmű közlés")
-    para(doc, "Az FX·King affiliate (partneri) jutalékot kap a partner-broker(ek)től azon "
-              "felhasználók kereskedése után, akik az FX·King-en keresztül regisztrálnak / "
-              "kapcsolódnak. Az FX·King ennek megfelelően anyagilag érdekelt.", bold=True, color=AMBER)
+    para(doc, "Az Rebound affiliate (partneri) jutalékot kap a partner-broker(ek)től azon "
+              "felhasználók kereskedése után, akik az Rebound-en keresztül regisztrálnak / "
+              "kapcsolódnak. Az Rebound ennek megfelelően anyagilag érdekelt.", bold=True, color=AMBER)
 
     h2(doc, "2. A rebate forrása")
     bullet(doc, "A felhasználónak fizetett rebate az affiliate jutalék (RevShare) visszaosztott része.")
@@ -273,7 +273,7 @@ def build_affiliate():
     bullet(doc, "A CPA ($600 / qualified FTD) a welcome / referral jutalmak és a működés fedezete.")
 
     h2(doc, "3. Függetlenség hiánya")
-    para(doc, "Az FX·King NEM független a partner-brokertől a jutalék mértékéig. Az "
+    para(doc, "Az Rebound NEM független a partner-brokertől a jutalék mértékéig. Az "
               "eszközök és tartalmak nem minősülnek pártatlan befektetési ajánlásnak.", bold=True)
 
     h2(doc, "4. Broker engedélyezés")
@@ -282,7 +282,7 @@ def build_affiliate():
     bullet(doc, "A célpiacok listáját jogi review hagyja jóvá.")
 
     h2(doc, "5. Összeférhetetlenség kezelése")
-    bullet(doc, "Az FX·King a rebate-et a tényleges, broker által visszaigazolt volumen alapján számolja.")
+    bullet(doc, "Az Rebound a rebate-et a tényleges, broker által visszaigazolt volumen alapján számolja.")
     bullet(doc, "A jutalom-mechanizmus nem ösztönöz a felhasználó érdekével ellentétes túlkereskedésre.")
 
     footer_disclaimer(doc)

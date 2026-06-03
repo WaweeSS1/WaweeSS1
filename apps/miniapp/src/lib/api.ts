@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? "https://api.fxking.io";
+const API_BASE = import.meta.env.VITE_API_URL ?? "https://api.rebound.app";
 
 function getInitData(): string {
   if (typeof window !== "undefined" && window.Telegram?.WebApp?.initData) {
@@ -25,14 +25,14 @@ export async function apiFetch<T>(path: string, options?: RequestInit): Promise<
 // Typed API calls
 export const api = {
   wallet: {
-    balance: () => apiFetch<import("@fxking/shared").WalletBalance>("/v1/wallet"),
+    balance: () => apiFetch<import("@rebound/shared").WalletBalance>("/v1/wallet"),
     history: () => apiFetch<unknown[]>("/v1/wallet/history"),
   },
   trades: {
-    stats: (period = "30d") => apiFetch<import("@fxking/shared").TradeStats>(`/v1/trades/stats?period=${period}`),
+    stats: (period = "30d") => apiFetch<import("@rebound/shared").TradeStats>(`/v1/trades/stats?period=${period}`),
   },
   rebates: {
-    summary: () => apiFetch<import("@fxking/shared").RebateSummary>("/v1/rebates/summary"),
+    summary: () => apiFetch<import("@rebound/shared").RebateSummary>("/v1/rebates/summary"),
   },
   referrals: {
     get: () => apiFetch<unknown>("/v1/referrals"),

@@ -27,7 +27,7 @@
    - Nincs befektetési tanács
 
 4. **Affiliate Disclosure**
-   - Egyértelmű közlés: az FX·King affiliate jutalékot kap a brokertől
+   - Egyértelmű közlés: az Rebound affiliate jutalékot kap a brokertől
    - A rebate az affiliate jutalék visszaosztása
    - Nem függetlenek a brokertől
 
@@ -40,7 +40,7 @@
 ```
 A CFD-ek és forex kereskedés magas kockázattal jár, és tőkéje elveszítésével járhat.
 A kiskereskedelmi CFD-számlák X%-a veszít pénzt. [X = valós broker adat]
-Ez nem befektetési tanács. FX·King eszközöket kínál, nem javaslatokat.
+Ez nem befektetési tanács. Rebound eszközöket kínál, nem javaslatokat.
 ```
 
 ## Generált vázlatok (jogász validálja)

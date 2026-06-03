@@ -13,7 +13,7 @@
         { "key": "Referrer-Policy", "value": "no-referrer" },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; frame-ancestors 'none'; connect-src 'self' https://api.fxking.app;"
+          "value": "default-src 'self'; frame-ancestors 'none'; connect-src 'self' https://api.rebound.app;"
         }
       ]
     }

@@ -39,7 +39,7 @@ export const COMPLIANCE = {
   // Risk warning szöveg — kötelező mindenhol
   RISK_WARNING: {
     SHORT: "CFD és forex kereskedés magas kockázattal jár. A tőkéd elveszítheted.",
-    LONG: "A CFD-ek és devizapárok kereskedése spekulatív termék, és tőkéd elvesztésével járhat. A retail CFD-kereskedők nagy százaléka veszít pénzt. Ez nem befektetési tanács. FX·King eszközöket kínál, nem javaslatokat (Tools, not tips).",
+    LONG: "A CFD-ek és devizapárok kereskedése spekulatív termék, és tőkéd elvesztésével járhat. A retail CFD-kereskedők nagy százaléka veszít pénzt. Ez nem befektetési tanács. Rebound eszközöket kínál, nem javaslatokat (Tools, not tips).",
     EU_ESMA: "A kiskereskedelmi ügyfelek %i%-a veszít pénzt ennél a szolgáltatónál. Győződj meg arról, hogy megérted a kockázatokat.",
   },
 

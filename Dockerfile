@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────
-# Shared Dockerfile for FX·King backend services (api | bot | broker-sync).
+# Shared Dockerfile for Rebound backend services (api | bot | broker-sync).
 # Pick the service at runtime with the SERVICE env var. Portable across
 # Render / Railway / Fly.io.
 # ─────────────────────────────────────────────────────────────────────────
@@ -21,7 +21,7 @@ RUN npm ci
 # ── build: generate Prisma client, then build all backend workspaces ──
 FROM deps AS build
 RUN npm run db:generate
-RUN npx turbo run build --filter=@fxking/api --filter=@fxking/bot --filter=@fxking/broker-sync
+RUN npx turbo run build --filter=@rebound/api --filter=@rebound/bot --filter=@rebound/broker-sync
 
 # ── runtime ──
 FROM base AS runtime

@@ -17,7 +17,7 @@ export function Dashboard() {
   return (
     <>
       <div className="admin-topbar">
-        <span className="topbar-title">FX·KING / DASHBOARD</span>
+        <span className="topbar-title">REBOUND / DASHBOARD</span>
         <div className="topbar-actions">
           <span style={{ fontFamily: "var(--font-data)", fontSize: "0.62rem", color: "var(--amber)" }}>● LIVE</span>
         </div>

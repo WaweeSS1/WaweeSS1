@@ -1,5 +1,5 @@
 {
-  "name": "@fxking/db",
+  "name": "@rebound/db",
   "version": "0.1.0",
   "private": true,
   "scripts": {

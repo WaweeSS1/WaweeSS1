@@ -16,9 +16,9 @@ async function bootstrap() {
   await app.register(helmet);
   await app.register(cors, {
     origin: [
-      process.env.LANDING_URL ?? "https://fxking.io",
-      process.env.WEBAPP_URL ?? "https://miniapp.fxking.io",
-      process.env.ADMIN_URL ?? "https://admin.fxking.io",
+      process.env.LANDING_URL ?? "https://rebound.app",
+      process.env.WEBAPP_URL ?? "https://miniapp.rebound.app",
+      process.env.ADMIN_URL ?? "https://admin.rebound.app",
     ],
     credentials: true,
   });

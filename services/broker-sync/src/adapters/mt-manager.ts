@@ -1,4 +1,4 @@
-import { PrismaClient } from "@fxking/db";
+import { PrismaClient } from "@rebound/db";
 
 const prisma = new PrismaClient();
 

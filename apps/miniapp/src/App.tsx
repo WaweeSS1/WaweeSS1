@@ -13,7 +13,7 @@ import { ReferralScreen } from "./screens/Referral";
 import { PayoutScreen } from "./screens/Payout";
 import { initTelegramApp } from "./lib/telegram";
 
-const ONBOARDED_KEY = "fxking_onboarded";
+const ONBOARDED_KEY = "rebound_onboarded";
 
 export default function App() {
   useEffect(() => {

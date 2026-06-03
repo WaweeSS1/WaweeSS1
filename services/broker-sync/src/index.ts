@@ -1,6 +1,6 @@
 import cron from "node-cron";
-import { PrismaClient } from "@fxking/db";
-import { calculateRebate } from "@fxking/shared";
+import { PrismaClient } from "@rebound/db";
+import { calculateRebate } from "@rebound/shared";
 import { syncIbTrades } from "./adapters/ib-api";
 import { syncMtTrades, type MtPlatform } from "./adapters/mt-manager";
 import { confirmCpaEvents } from "./cpa-reconciliation";

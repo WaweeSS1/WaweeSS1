@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-FX·King economics model generator.
+Rebound economics model generator.
 
 Builds docs/economics.xlsx — a fully tunable financial model.
 Change any cell on the "Bemenetek" (Inputs) sheet and every downstream
@@ -65,7 +65,7 @@ def cell(ws, ref, value, font=VAL, fillhex=SURFACE, border=True, align="left", n
 # ════════════════════════════════════════════════════════════════════════════
 ws = wb.active
 ws.title = "Bemenetek"
-style_header(ws, "FX·KING — GAZDASÁGI MODELL", "Hangolható bemenetek · módosíts bármit, a többi lap újraszámol · forrás: compliance.ts")
+style_header(ws, "REBOUND — GAZDASÁGI MODELL", "Hangolható bemenetek · módosíts bármit, a többi lap újraszámol · forrás: compliance.ts")
 ws.column_dimensions["A"].width = 42
 ws.column_dimensions["B"].width = 16
 ws.column_dimensions["C"].width = 50
@@ -105,7 +105,7 @@ for label, value, unit, note in inputs:
         nf = '#,##0.00' if isinstance(value, float) else '#,##0'
         if unit == "%": nf = '0%'
         bc = cell(ws, f"B{r}", value, font=INPUT_FONT, fillhex=AMBER, align="center", numfmt=nf)
-        bc.comment = Comment(note, "FX·King") if note else None
+        bc.comment = Comment(note, "Rebound") if note else None
         cell(ws, f"C{r}", note or "", font=LBL2)
         input_refs[label] = f"Bemenetek!B{r}"
     r += 1

@@ -16,8 +16,8 @@ export function OnboardingScreen() {
   const navigate = useNavigate();
 
   function finish() {
-    localStorage.setItem("fxking_onboarded", "1");
-    localStorage.setItem("fxking_skill", skill ?? "BEGINNER");
+    localStorage.setItem("rebound_onboarded", "1");
+    localStorage.setItem("rebound_skill", skill ?? "BEGINNER");
     navigate("/wallet", { replace: true });
   }
 
@@ -65,7 +65,7 @@ export function OnboardingScreen() {
           <div className="risk-box" role="note" aria-label="Kockázati figyelmeztetés">
             <strong>KOCKÁZATI FIGYELMEZTETÉS</strong>
             A CFD-ek és forex kereskedés spekulatív termék. A kiskereskedelmi számlák nagy százaléka veszít pénzt.
-            Az FX·King cash rebate-et kínál és trader eszközöket — nem befektetési tanácsot, nem profitgaranciát.
+            Az Rebound cash rebate-et kínál és trader eszközöket — nem befektetési tanácsot, nem profitgaranciát.
             Tools, not tips.
           </div>
           <div className="panel" style={{ marginBottom: "var(--sp-4)" }}>

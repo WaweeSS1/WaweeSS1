@@ -5,8 +5,8 @@ const DEMO_REFERRALS = [
   { id: "2", username: "@forex_kati",    qualifiedAt: null,                  reward: null, clawedBack: false },
 ];
 
-const MY_CODE = "FXKING-A1B2C3";
-const BOT_USERNAME = "FXKingBot";
+const MY_CODE = "REBOUND-A1B2C3";
+const BOT_USERNAME = "ReboundBot";
 const DEEP_LINK = `https://t.me/${BOT_USERNAME}?start=${MY_CODE}`;
 
 export function ReferralScreen() {

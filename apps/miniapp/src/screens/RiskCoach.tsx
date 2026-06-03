@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const SKILL_LEVEL = localStorage.getItem("fxking_skill") ?? "BEGINNER";
+const SKILL_LEVEL = localStorage.getItem("rebound_skill") ?? "BEGINNER";
 const IS_BEGINNER = SKILL_LEVEL === "BEGINNER";
 
 export function RiskCoachScreen() {

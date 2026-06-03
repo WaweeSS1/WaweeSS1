@@ -1,5 +1,5 @@
 {
-  "name": "@fxking/bot",
+  "name": "@rebound/bot",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,8 +8,8 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@fxking/shared": "*",
-    "@fxking/db": "*",
+    "@rebound/shared": "*",
+    "@rebound/db": "*",
     "grammy": "^1.27.0",
     "ioredis": "^5.3.2"
   },

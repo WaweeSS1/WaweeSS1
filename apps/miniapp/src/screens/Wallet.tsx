@@ -55,7 +55,7 @@ export function WalletScreen() {
     <div className="screen page-pad">
       {/* Header */}
       <div className="screen-header" style={{ padding: "var(--sp-3) 0 var(--sp-4)" }}>
-        <div className="screen-title">FX·KING / WALLET</div>
+        <div className="screen-title">REBOUND / WALLET</div>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--sp-2)" }}>
           <span className="status-dot" />
           <span style={{ fontFamily: "var(--font-data)", fontSize: "0.58rem", letterSpacing: "0.16em", color: "var(--amber)", textTransform: "uppercase" }}>LIVE</span>
