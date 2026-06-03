@@ -43,4 +43,20 @@ A kiskereskedelmi CFD-számlák X%-a veszít pénzt. [X = valós broker adat]
 Ez nem befektetési tanács. FX·King eszközöket kínál, nem javaslatokat.
 ```
 
+## Generált vázlatok (jogász validálja)
+
+Az alábbi szerkeszthető `.docx` vázlatok elkészültek (forrás: `scripts/build_legal_docs.py`,
+seed: `packages/shared/src/compliance.ts`). Mindegyik a kötelező *„JOGÁSZ VALIDÁLJA LAUNCH ELŐTT"*
+piros bannerrel, `[ ]` helykitöltőkkel a cégadatoknak / ESMA %-nak:
+
+| # | Dokumentum | Fájl |
+|---|------------|------|
+| 1 | Általános Szerződési Feltételek (ÁSZF / T&C) | `docs/legal/01-ASZF-TC.docx` |
+| 2 | Adatvédelmi Tájékoztató (GDPR) | `docs/legal/02-Adatvedelem-GDPR.docx` |
+| 3 | Kockázati Tájékoztató (Risk Disclosure) | `docs/legal/03-Kockazati-Tajekoztato.docx` |
+| 4 | Affiliate Disclosure | `docs/legal/04-Affiliate-Disclosure.docx` |
+
+> A `.docx` formátum szándékos: a jogász track-changes-szel szerkesztheti. A véglegesítést
+> követően ezekből készülnek a publikus PDF-ek.
+
 **LAUNCH GATE: Jogi jóváhagyás nélkül nem indítható.**
