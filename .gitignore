@@ -1,0 +1,25 @@
+node_modules/
+dist/
+.astro/
+*.env
+.env.local
+.env.production
+.env.*.local
+
+# Prisma
+packages/db/node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Build
+*.tsbuildinfo

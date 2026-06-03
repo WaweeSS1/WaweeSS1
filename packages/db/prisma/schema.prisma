@@ -1,0 +1,221 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ──────────────────────────────────────────────────────────────────
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum Tier {
+  STANDARD
+  VIP
+}
+
+enum LinkType {
+  INVESTOR_PASSWORD  // MT4/5 investor read-only
+  IB_API
+  OCR_FALLBACK
+}
+
+enum WalletLedgerType {
+  REBATE   // cash rebate — kifizethető, SOHA nem trade-locked
+  REWARD   // welcome / referral reward (csak megerősített CPA után)
+}
+
+enum LedgerOp {
+  CREDIT
+  DEBIT
+}
+
+enum RebateStatus {
+  PENDING
+  CONFIRMED
+  CLAWED_BACK  // ha a broker visszavonja a CPA-t
+}
+
+enum PayoutMethod {
+  USDC_BEP20
+  BANK_TRANSFER
+}
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  PAID
+  REJECTED
+}
+
+enum FraudSignal {
+  DUPLICATE_PHONE
+  DUPLICATE_WALLET
+  DUPLICATE_DEVICE
+  DUPLICATE_IP
+  SUSPICIOUS_VOLUME
+  MANUAL_FLAG
+}
+
+// ── Models ─────────────────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  tgId         String    @unique @map("tg_id")
+  tgUsername   String?   @map("tg_username")
+  skillLevel   SkillLevel @default(BEGINNER) @map("skill_level")
+  riskProfile  Json       @default("{}") @map("risk_profile")
+  tier         Tier       @default(STANDARD)
+  referralCode String     @unique @default(cuid()) @map("referral_code")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  accounts     Account[]
+  walletEntries WalletEntry[]
+  referralsMade Referral[]  @relation("Inviter")
+  referralUsed  Referral?   @relation("Invitee")
+  payouts       Payout[]
+  fraudFlags    FraudFlag[]
+
+  @@map("users")
+}
+
+model Account {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  broker    String
+  login     String
+  linkType  LinkType @map("link_type")
+  ftdAt     DateTime? @map("ftd_at")
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user       User       @relation(fields: [userId], references: [id])
+  trades     Trade[]
+  cpaEvents  CpaEvent[]
+
+  @@map("accounts")
+}
+
+model Trade {
+  id          String   @id @default(cuid())
+  accountId   String   @map("account_id")
+  pair        String
+  side        String   // BUY | SELL
+  lots        Decimal  @db.Decimal(10, 4)
+  pnl         Decimal  @db.Decimal(12, 2)
+  openedAt    DateTime @map("opened_at")
+  closedAt    DateTime? @map("closed_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  account  Account  @relation(fields: [accountId], references: [id])
+  rebates  Rebate[]
+
+  @@map("trades")
+}
+
+// Append-only ledger — soha ne töröld vagy módosítsd a sorokat
+model Rebate {
+  id        String       @id @default(cuid())
+  tradeId   String       @map("trade_id")
+  lots      Decimal      @db.Decimal(10, 4)
+  rate      Decimal      @db.Decimal(8, 4)  // USD/lot
+  amount    Decimal      @db.Decimal(10, 2) // kifizethető cash
+  status    RebateStatus @default(PENDING)
+  createdAt DateTime     @default(now()) @map("created_at")
+  confirmedAt DateTime?  @map("confirmed_at")
+  clawedBackAt DateTime? @map("clawed_back_at")
+  clawedBackReason String? @map("clawed_back_reason")
+
+  trade       Trade        @relation(fields: [tradeId], references: [id])
+  walletEntry WalletEntry?
+
+  @@map("rebates")
+}
+
+// Append-only wallet ledger — kifizethető, SOHA nem trade-locked
+model WalletEntry {
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id")
+  type      WalletLedgerType
+  op        LedgerOp
+  amount    Decimal          @db.Decimal(10, 2)
+  balance   Decimal          @db.Decimal(10, 2) // running total after this entry
+  rebateId  String?          @unique @map("rebate_id")
+  payoutId  String?          @map("payout_id")
+  note      String?
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user    User     @relation(fields: [userId], references: [id])
+  rebate  Rebate?  @relation(fields: [rebateId], references: [id])
+  payout  Payout?  @relation(fields: [payoutId], references: [id])
+
+  @@map("wallet")
+}
+
+model Referral {
+  id           String    @id @default(cuid())
+  inviterId    String    @map("inviter")
+  inviteeId    String    @unique @map("invitee")
+  qualifiedAt  DateTime? @map("qualified_at")  // broker-megerősített FTD után
+  reward       Decimal?  @db.Decimal(10, 2)    // $80 default
+  clawedBack   Boolean   @default(false) @map("clawed_back")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  inviter User @relation("Inviter", fields: [inviterId], references: [id])
+  invitee User @relation("Invitee", fields: [inviteeId], references: [id])
+
+  @@map("referrals")
+}
+
+// Jutalom csak broker-megerősített FTD + qualifying volume után
+model CpaEvent {
+  id          String    @id @default(cuid())
+  accountId   String    @map("account_id")
+  amount      Decimal   @db.Decimal(10, 2) // $600 default CPA
+  confirmedAt DateTime? @map("confirmed_at")
+  paidAt      DateTime? @map("paid_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id])
+
+  @@map("cpa_events")
+}
+
+model Payout {
+  id          String       @id @default(cuid())
+  userId      String       @map("user_id")
+  amount      Decimal      @db.Decimal(10, 2)
+  method      PayoutMethod
+  status      PayoutStatus @default(PENDING)
+  txHash      String?      @map("tx_hash")         // USDC on-chain
+  bankRef     String?      @map("bank_ref")
+  approvedBy  String?      @map("approved_by")     // admin user id
+  approvedAt  DateTime?    @map("approved_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+  walletEntries WalletEntry[]
+
+  @@map("payouts")
+}
+
+model FraudFlag {
+  id          String      @id @default(cuid())
+  userId      String      @map("user_id")
+  signal      FraudSignal
+  detail      Json        @default("{}")
+  reviewedBy  String?     @map("reviewed_by")
+  resolvedAt  DateTime?   @map("resolved_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("fraud_flags")
+}
