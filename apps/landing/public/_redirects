@@ -1,0 +1,3 @@
+# Cloudflare Pages redirects
+# Send "open app" CTA to the Telegram Mini App deep link.
+/app    https://t.me/FxKingBot/app    302

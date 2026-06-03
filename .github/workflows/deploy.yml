@@ -1,0 +1,92 @@
+name: Deploy
+
+# Runs after CI on main. Each surface deploys only if its secret is configured,
+# so a partially-configured repo degrades gracefully instead of failing.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  landing:
+    name: Landing → Cloudflare Pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: guard
+        run: echo "ok=${{ secrets.CLOUDFLARE_API_TOKEN != '' }}" >> "$GITHUB_OUTPUT"
+      - if: steps.guard.outputs.ok == 'true'
+        uses: actions/setup-node@v4
+        with: { node-version: "20", cache: "npm" }
+      - if: steps.guard.outputs.ok == 'true'
+        run: npm ci
+      - if: steps.guard.outputs.ok == 'true'
+        run: npx turbo run build --filter=@fxking/landing
+      - if: steps.guard.outputs.ok == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy apps/landing/dist --project-name=fxking-landing
+
+  miniapp:
+    name: Mini App → Vercel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: guard
+        run: echo "ok=${{ secrets.VERCEL_TOKEN != '' }}" >> "$GITHUB_OUTPUT"
+      - if: steps.guard.outputs.ok == 'true'
+        uses: actions/setup-node@v4
+        with: { node-version: "20", cache: "npm" }
+      - if: steps.guard.outputs.ok == 'true'
+        run: npm i -g vercel@latest
+      - if: steps.guard.outputs.ok == 'true'
+        working-directory: apps/miniapp
+        run: |
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_MINIAPP_PROJECT_ID }}
+
+  admin:
+    name: Admin → Vercel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: guard
+        run: echo "ok=${{ secrets.VERCEL_TOKEN != '' }}" >> "$GITHUB_OUTPUT"
+      - if: steps.guard.outputs.ok == 'true'
+        uses: actions/setup-node@v4
+        with: { node-version: "20", cache: "npm" }
+      - if: steps.guard.outputs.ok == 'true'
+        run: npm i -g vercel@latest
+      - if: steps.guard.outputs.ok == 'true'
+        working-directory: apps/admin
+        run: |
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
+
+  backend:
+    name: Backend → Render (api + bot + broker-sync)
+    runs-on: ubuntu-latest
+    steps:
+      - id: guard
+        run: echo "ok=${{ secrets.RENDER_DEPLOY_HOOK_API != '' }}" >> "$GITHUB_OUTPUT"
+      # Render builds the Docker image and runs `prisma migrate deploy` on the
+      # api service at boot (see docker-entrypoint.sh).
+      - if: steps.guard.outputs.ok == 'true'
+        run: |
+          curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK_API }}"
+          [ -n "${{ secrets.RENDER_DEPLOY_HOOK_BOT }}" ]         && curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK_BOT }}" || true
+          [ -n "${{ secrets.RENDER_DEPLOY_HOOK_BROKER_SYNC }}" ] && curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK_BROKER_SYNC }}" || true

@@ -1,0 +1,67 @@
+# Render Blueprint — FX·King backend (api + bot + broker-sync).
+# DB = Neon (external), Redis = Upstash (external); both referenced via env.
+# Deploy: Render dashboard → New → Blueprint → point at this repo.
+services:
+  - type: web
+    name: fxking-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: frankfurt          # EU region — GDPR
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: SERVICE
+        value: api
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "8080"
+      - fromGroup: fxking-shared
+
+  - type: worker
+    name: fxking-bot
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    envVars:
+      - key: SERVICE
+        value: bot
+      - fromGroup: fxking-shared
+
+  - type: worker
+    name: fxking-broker-sync
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    envVars:
+      - key: SERVICE
+        value: broker-sync
+      - fromGroup: fxking-shared
+
+# Secrets live in a shared env group (set values in the Render dashboard).
+envVarGroups:
+  - name: fxking-shared
+    envVars:
+      - key: DATABASE_URL          # Neon pooled URL
+      - key: DIRECT_URL            # Neon direct URL (migrations)
+      - key: REDIS_URL             # Upstash
+      - key: BOT_TOKEN
+      - key: WEBAPP_URL
+      - key: API_URL
+      - key: LANDING_URL
+      - key: ADMIN_URL
+      - key: JWT_SECRET
+      - key: IB_API_BASE_URL
+      - key: IB_API_KEY
+      - key: MT_GATEWAY_URL
+      - key: MT_GATEWAY_KEY
+      - key: OCR_GATEWAY_URL
+      - key: OCR_GATEWAY_KEY
+      - key: BROKER_MIN_QUALIFYING_LOTS
+      - key: ALLOWED_COUNTRIES
+      - key: SENTRY_DSN
