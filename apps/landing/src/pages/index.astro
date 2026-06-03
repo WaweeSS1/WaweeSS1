@@ -1,0 +1,375 @@
+---
+const botLink = "https://t.me/FXKingBot";
+const riskPercent = "74"; // placeholder — valós broker adattal töltendő
+---
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="FX·King — cash rebate kereskedőknek. Kereskedj okosabban, kapj pénzt érte. Trader eszközök, nem tippek." />
+  <meta property="og:title" content="FX·King — Trader eszközök + cash rebate" />
+  <meta property="og:description" content="Minden lot után kifizethető cash rebate. Napló, kockázatkezelő, kalkulátor." />
+  <meta property="og:type" content="website" />
+  <title>FX·King — Trader eszközök + cash rebate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/styles/fieldwork.css" />
+</head>
+<body>
+
+<!-- ── Risk Strip (top) ───────────────────────────────────── -->
+<div class="risk-strip" role="note" aria-label="Kockázati figyelmeztetés">
+  <strong>KOCKÁZATI FIGYELMEZTETÉS:</strong> A CFD-ek és forex kereskedés spekulatív termék. A kiskereskedelmi számlák <strong>{riskPercent}%-a</strong> veszít pénzt. Ez nem befektetési tanács.
+</div>
+
+<!-- ── Header ────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="container">
+    <div class="site-header__inner">
+      <a href="/" class="site-logo">FX<span>·</span>KING</a>
+      <nav aria-label="Főmenü">
+        <ul class="site-nav">
+          <li><a href="#how-it-works">Hogyan működik</a></li>
+          <li><a href="#tools">Eszközök</a></li>
+          <li><a href="#cashback">Cashback</a></li>
+          <li><a href="#faq">GYIK</a></li>
+        </ul>
+      </nav>
+      <a href={botLink} class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+        Megnyitás Telegramon
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ── Hero ──────────────────────────────────────────────── -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container">
+    <div class="hero__grid">
+      <div class="hero__content">
+        <div class="eyebrow">Cash rebate kereskedőknek</div>
+        <h1 id="hero-title" class="display hero__headline">
+          Kereskedj<br />okosabban.<br /><span style="color:var(--amber)">Kapj pénzt érte.</span>
+        </h1>
+        <p class="hero__sub">
+          Minden zárt lot után <strong style="color:var(--ink)">kifizethető cash rebate</strong> kerül jóvá a tárcádban.
+          Nem kredit, nem trade-locked bónusz — valódi pénz, amit kikérhetsz.
+          Mellé napló, risk coach és kalkulátor, mert a retenció növeli a RevShare-t, nem a veszteség pörgetése.
+        </p>
+        <div class="hero__actions">
+          <a href={botLink} class="btn btn-primary btn-lg" target="_blank" rel="noopener noreferrer">
+            Indítás Telegramon →
+          </a>
+          <a href="#how-it-works" class="btn btn-outline btn-lg">Hogyan működik</a>
+        </div>
+        <p class="hero__disclaimer">Tools, not tips. Nincs befektetési tanács.</p>
+      </div>
+
+      <div class="hero__card-wrap" aria-hidden="true">
+        <div class="hero__instrument">
+          <div class="hero__instrument-top">
+            <span class="hero__instrument-id">FX·KING / REBATE WALLET</span>
+            <span class="hero__instrument-status">
+              <span class="status-dot"></span>
+              LIVE
+            </span>
+          </div>
+          <div class="hero__instrument-body">
+            <div class="label hero__balance-label">Kifizetendő egyenleg</div>
+            <div class="hero__balance">$247.60</div>
+            <div class="hero__balance-sub">CASH · NEM TRADE-LOCKED · $20-TÓL KIFIZETHETŐ</div>
+            <div class="hero__instrument-rows">
+              <div class="hero__instrument-row">
+                <span class="rlabel">Folyó hónap rebate</span>
+                <span class="rval">+$38.40</span>
+              </div>
+              <div class="hero__instrument-row">
+                <span class="rlabel">Aktív kereskedési szint</span>
+                <span class="rval">STANDARD · $1.20/lot</span>
+              </div>
+              <div class="hero__instrument-row">
+                <span class="rlabel">Legutóbbi payout</span>
+                <span class="rval neutral">$80.00 · 3 napja</span>
+              </div>
+              <div class="hero__instrument-row">
+                <span class="rlabel">Referral (this month)</span>
+                <span class="rval">2 qualified · +$160.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ───────────────────────────────────────── -->
+<section id="how-it-works" class="section" aria-labelledby="hiw-title">
+  <div class="container">
+    <div class="eyebrow">Hogyan működik</div>
+    <h2 id="hiw-title" class="headline">Három lépés</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step__num">01 / Csatlakozz</span>
+        <h3 class="step__title">Nyisd meg a botot</h3>
+        <p class="step__body">
+          Telegram boton keresztül regisztrálsz, összekapcsolod a broker-számlád (IB API vagy MT4/5 investor jelszó), és azonnal látod a kereskedési adataidat.
+        </p>
+      </div>
+      <div class="step">
+        <span class="step__num">02 / Kereskedj</span>
+        <h3 class="step__title">Gyűjtsd a rebate-et</h3>
+        <p class="step__body">
+          Minden egyes zárt lot után automatikusan rebate kerül jóvá. Standard szinten <strong style="color:var(--amber)">$1.20/lot</strong>, VIP-en <strong style="color:var(--amber)">$1.60/lot</strong>. Nincs teendőd.
+        </p>
+      </div>
+      <div class="step">
+        <span class="step__num">03 / Kérj payoutot</span>
+        <h3 class="step__title">Vedd fel a pénzt</h3>
+        <p class="step__body">
+          $20-tól kérhetsz kifizetést — USDC (on-chain TX hash) vagy banki átutalás. Nem kredit, nem bónusz, valódi cash.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Tools ──────────────────────────────────────────────── -->
+<section id="tools" class="section" aria-labelledby="tools-title">
+  <div class="container">
+    <div class="eyebrow">Eszközök</div>
+    <h2 id="tools-title" class="headline">Tools, not tips.</h2>
+    <p style="color:var(--ink-2);margin-top:var(--sp-3);margin-bottom:0;max-width:560px;font-family:var(--font-ui);line-height:1.7;">
+      A rebate az egyik oldal. A másik: eszközök, amik segítenek tovább maradni a piacon.
+      Mert a retenció növeli a RevShare-t — nem a veszteség pörgetése.
+    </p>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-card__code">MODULE / JOURNAL</div>
+        <h3 class="tool-card__name">Trade-napló</h3>
+        <p class="tool-card__desc">
+          Auto-import MT4/5-ből vagy IB API-ból. Win rate, R:R, drawdown és mintafelismerés (pl. revenge trading detekció).
+        </p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-card__code">MODULE / RISK</div>
+        <h3 class="tool-card__name">Risk Coach</h3>
+        <p class="tool-card__desc">
+          Napi veszteséglimit figyelmeztetés, túlkereskedés-jelzés. Kezdőknek alapból be, csak tudatos döntéssel kapcsolható ki.
+        </p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-card__code">MODULE / CALC</div>
+        <h3 class="tool-card__name">Pozícióméret-kalkulátor</h3>
+        <p class="tool-card__desc">
+          Számítsd ki az optimális lot-méretet a kockázatvállalásod és a stop-loss alapján. Minden ügylet előtt.
+        </p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-card__code">MODULE / CALENDAR</div>
+        <h3 class="tool-card__name">Gazdasági naptár</h3>
+        <p class="tool-card__desc">
+          Push értesítés a fontos eseményekre. Ne legyél bent a piacban, amikor nem kell.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Cashback Tiers ─────────────────────────────────────── -->
+<section id="cashback" class="section" aria-labelledby="cashback-title">
+  <div class="container">
+    <div class="eyebrow">Cashback szintek</div>
+    <h2 id="cashback-title" class="headline">Minél többet kezelsz, annál több cash</h2>
+    <div class="tier-table-wrap">
+      <table class="tier-table" role="table">
+        <caption class="sr-only">Cashback szintek összehasonlítása</caption>
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Standard</th>
+            <th scope="col" class="vip-col">VIP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-label">Rebate lot után</td>
+            <td>$1.20 / lot</td>
+            <td class="highlight">$1.60 / lot</td>
+          </tr>
+          <tr>
+            <td class="row-label">Minimális kifizetés</td>
+            <td>$20</td>
+            <td class="highlight">$20</td>
+          </tr>
+          <tr>
+            <td class="row-label">Payout módszer</td>
+            <td>USDC / Bank</td>
+            <td class="highlight">USDC / Bank</td>
+          </tr>
+          <tr>
+            <td class="row-label">Welcome cash (első FTD után)</td>
+            <td>$100</td>
+            <td class="highlight">$100</td>
+          </tr>
+          <tr>
+            <td class="row-label">Referral jutalom (per FTD)</td>
+            <td>$80</td>
+            <td class="highlight">$80</td>
+          </tr>
+          <tr>
+            <td class="row-label">Trade-napló + Risk Coach</td>
+            <td>✓</td>
+            <td class="highlight">✓</td>
+          </tr>
+          <tr>
+            <td class="row-label" style="color:var(--ink-3);font-size:0.8rem;">*Jutalom csak broker-megerősített FTD + qualifying volume után</td>
+            <td style="color:var(--ink-3);font-size:0.8rem;">✓</td>
+            <td style="color:var(--ink-3);font-size:0.8rem;">✓</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:var(--sp-4);">
+      <div class="risk-notice" role="note">
+        <strong>FONTOS:</strong> A fenti jutalmak kizárólag <strong>broker által megerősített FTD + qualifying kereskedési volumen</strong> után kerülnek jóváírásra.
+        A rebate-ek cash formájában fizetendők ki — nem trade-locked kredit, nem bónusz.
+        Welcome cash keretezése: „megemelt első havi rebate". Clawback érvényes, ha a broker visszavonja a CPA-t.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ────────────────────────────────────────────────── -->
+<section id="faq" class="section" aria-labelledby="faq-title">
+  <div class="container" style="max-width:760px;">
+    <div class="eyebrow">Gyakori kérdések</div>
+    <h2 id="faq-title" class="headline">GYIK</h2>
+    <div class="faq-list" role="list">
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-item__q" aria-expanded="false" aria-controls="faq-1">
+          Tényleg kifizethető a rebate? Nem trade-locked kredit?
+        </button>
+        <div id="faq-1" class="faq-item__a" role="region">
+          Igen, a rebate 100%-ban cash — semmilyen formában nem kötött kereskedéshez. $20 egyenleg felett bármikor kérhetsz USDC (on-chain TX hashsel) vagy banki kifizetést. Ez az EU-ban tiltott trade-locked bónuszoktól alapvetően különböző termék.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-item__q" aria-expanded="false" aria-controls="faq-2">
+          Hogyan kötöm össze a broker-számlám?
+        </button>
+        <div id="faq-2" class="faq-item__a" role="region">
+          Három módon: (1) IB REST API kulccsal, (2) MT4/5 investor jelszóval (csak olvasási jog, nem kereskedési), (3) manuális kivonat OCR feldolgozással. Az összekapcsolás a Telegram Mini Appban, az Onboarding folyamatban történik.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-item__q" aria-expanded="false" aria-controls="faq-3">
+          Mikor kapom meg a welcome casht ($100)?
+        </button>
+        <div id="faq-3" class="faq-item__a" role="region">
+          A welcome cash (keretezése: megemelt első havi rebate) kizárólag broker által megerősített FTD (First Time Deposit) és qualifying kereskedési volumen teljesítése után kerül jóváírásra. Ez nem azonnali bónusz signup után.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-item__q" aria-expanded="false" aria-controls="faq-4">
+          Hogyan működik a referral program?
+        </button>
+        <div id="faq-4" class="faq-item__a" role="region">
+          Minden meghívottad után, aki teljesíti az FTD és qualifying volume feltételt, $80 kerül a tárcádba. Csak XP (státuszpont) jár a signupért — cash csak megerősített FTD után. Clawback érvényes, ha a broker visszavonja a CPA-t.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-item__q" aria-expanded="false" aria-controls="faq-5">
+          Ez befektetési tanács? Garantálják a profitot?
+        </button>
+        <div id="faq-5" class="faq-item__a" role="region">
+          Nem. Az FX·King trader eszközöket kínál és a kereskedési volumenedre épülő cash rebate-et fizet — semmilyen befektetési tanácsot nem ad, és semmilyen profitot nem garantál. A CFD és forex kereskedés magas kockázattal jár. Tools, not tips.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────── -->
+<section class="section" style="text-align:center;" aria-labelledby="cta-title">
+  <div class="container" style="max-width:600px;">
+    <div class="eyebrow" style="justify-content:center;">Csatlakozz</div>
+    <h2 id="cta-title" class="headline" style="margin-bottom:var(--sp-4);">
+      Kereskedj. Gyűjts.<br />Vedd fel a pénzt.
+    </h2>
+    <p style="color:var(--ink-2);margin-bottom:var(--sp-5);font-family:var(--font-ui);">
+      Nyisd meg a Telegram botot, kapcsold össze a broker-számlád, és azonnal elindulnak a rebate-ek.
+    </p>
+    <a href={botLink} class="btn btn-primary btn-lg" target="_blank" rel="noopener noreferrer">
+      Megnyitás Telegramon →
+    </a>
+    <p style="margin-top:var(--sp-4);font-family:var(--font-data);font-size:0.65rem;color:var(--ink-3);letter-spacing:0.06em;">
+      Tools, not tips · Nincs befektetési tanács · Jogi validáció szükséges a launch előtt
+    </p>
+  </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────────────── -->
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <a href="/" class="site-footer__logo">FX<span>·</span>KING</a>
+        <p class="site-footer__desc">
+          Cash rebate kereskedőknek. Trader eszközök, nem tippek.<br />
+          EU-kompatibilis, kifizethető cash — soha nem trade-locked.
+        </p>
+      </div>
+      <div class="site-footer__col">
+        <h4>Termék</h4>
+        <ul>
+          <li><a href="#how-it-works">Hogyan működik</a></li>
+          <li><a href="#tools">Eszközök</a></li>
+          <li><a href="#cashback">Cashback szintek</a></li>
+          <li><a href="#faq">GYIK</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h4>Jogi</h4>
+        <ul>
+          <li><a href="/terms">Általános feltételek</a></li>
+          <li><a href="/privacy">Adatvédelem (GDPR)</a></li>
+          <li><a href="/risk">Kockázati tájékoztató</a></li>
+          <li><a href="/disclosure">Affiliate közlés</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__bottom">
+      <p class="site-footer__risk">
+        <strong>KOCKÁZATI FIGYELMEZTETÉS:</strong> A CFD-ek és forex kereskedés spekulatív termék, és tőkéje elveszítésével járhat.
+        A kiskereskedelmi CFD-számlák {riskPercent}%-a veszít pénzt ennél a szolgáltatónál.
+        Az FX·King affiliate jutalékot kap a partnerbrokertől, és annak egy részét cash rebate formájában visszaosztja.
+        Ez nem befektetési tanács. Jogi validáció szükséges a launch előtt — ESMA/MNB.
+      </p>
+      <span style="white-space:nowrap;">© 2024 FX·King</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-item__q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      const answerId = btn.getAttribute('aria-controls');
+      const answer = document.getElementById(answerId);
+      if (answer) answer.classList.toggle('open', !expanded);
+    });
+  });
+</script>
+
+</body>
+</html>
