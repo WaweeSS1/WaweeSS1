@@ -1,7 +1,12 @@
 import { PrismaClient } from "@fxking/db";
 import { COMPLIANCE } from "@fxking/shared";
+import { verifyMtFtd, type MtPlatform } from "./adapters/mt-manager";
 
 const prisma = new PrismaClient();
+
+// Minimum broker-confirmed closed volume (lots) that qualifies for reward
+// release. Configurable; the gate itself is NON-NEGOTIABLE (compliance).
+const MIN_QUALIFYING_LOTS = Number(process.env.BROKER_MIN_QUALIFYING_LOTS ?? 1);
 
 export async function confirmCpaEvents(): Promise<void> {
   // Find accounts with FTD but no confirmed CPA event
@@ -10,7 +15,7 @@ export async function confirmCpaEvents(): Promise<void> {
   });
 
   for (const account of accounts) {
-    const confirmed = await verifyFtdWithBroker(account.login);
+    const confirmed = await verifyFtdWithBroker(account);
     if (!confirmed) continue;
 
     await prisma.$transaction(async (tx) => {
@@ -110,8 +115,44 @@ async function clawbackCpaEvent(cpaEventId: string, reason: string): Promise<voi
   });
 }
 
-async function verifyFtdWithBroker(ibLogin: string): Promise<boolean> {
-  // Stub: in production, call IB API to verify FTD + qualifying volume
-  // Returns true only when broker confirms
-  return false;
+/**
+ * Verify broker-confirmed FTD + qualifying volume. Reward release is gated on
+ * this returning true — NON-NEGOTIABLE. Routed by link type:
+ *   • INVESTOR_PASSWORD → MT Manager gateway (read-only)
+ *   • IB_API            → IB account summary (read-only)
+ *   • OCR_FALLBACK      → never auto-confirms (low-trust, manual review only)
+ */
+async function verifyFtdWithBroker(account: {
+  login: string;
+  linkType: "IB_API" | "INVESTOR_PASSWORD" | "OCR_FALLBACK";
+  platform: string | null;
+}): Promise<boolean> {
+  switch (account.linkType) {
+    case "INVESTOR_PASSWORD":
+      return verifyMtFtd(account.login, (account.platform as MtPlatform) || "MT5", MIN_QUALIFYING_LOTS);
+    case "IB_API":
+      return verifyIbFtd(account.login, MIN_QUALIFYING_LOTS);
+    case "OCR_FALLBACK":
+    default:
+      // OCR statements are never sufficient to release rewards on their own.
+      return false;
+  }
+}
+
+async function verifyIbFtd(ibLogin: string, minQualifyingLots: number): Promise<boolean> {
+  const baseUrl = process.env.IB_API_BASE_URL;
+  const apiKey = process.env.IB_API_KEY;
+  if (!baseUrl || !apiKey) return false;
+
+  const res = await fetch(`${baseUrl}/v1/accounts/${ibLogin}/summary`, {
+    headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json" },
+  });
+  if (!res.ok) return false;
+
+  const s = (await res.json()) as {
+    firstDepositConfirmed: boolean;
+    totalDeposits: number;
+    closedVolumeLots: number;
+  };
+  return s.firstDepositConfirmed && s.totalDeposits > 0 && s.closedVolumeLots >= minQualifyingLots;
 }

@@ -87,14 +87,16 @@ model User {
 }
 
 model Account {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  broker    String
-  login     String
-  linkType  LinkType @map("link_type")
-  ftdAt     DateTime? @map("ftd_at")
-  verified  Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  broker       String
+  login        String
+  linkType     LinkType  @map("link_type")
+  platform     String?   // "MT4" | "MT5" — only for INVESTOR_PASSWORD links
+  ftdAt        DateTime? @map("ftd_at")
+  verified     Boolean   @default(false)
+  lastSyncedAt DateTime? @map("last_synced_at") // incremental broker sync cursor
+  createdAt    DateTime  @default(now()) @map("created_at")
 
   user       User       @relation(fields: [userId], references: [id])
   trades     Trade[]
