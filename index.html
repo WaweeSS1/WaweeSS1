@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Rebound — minden lot visszapattan. Készpénzben.</title>
+<meta name="description" content="A kereskedésed költségének egy része valódi készpénzként visszapattan a tárcádba. Nem trade-locked. Eszközök, nem tippek." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23F5A623'/%3E%3C/svg%3E" />
+<meta name="theme-color" content="#ffffff" />
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff; --bg2:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#86868b;
+  --line:#d2d2d7; --line2:#e8e8ed;
+  --accent:#E0900A; --accent2:#F5A623; --accent-soft:rgba(224,144,10,.1);
+  --green:#1d8a37; --red:#E5534B;
+  --sans:"SF Pro Display","SF Pro Text",-apple-system,BlinkMacSystemFont,"Figtree","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --ease:cubic-bezier(.28,.11,.32,1); --w:980px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;overflow-x:clip;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.47;-webkit-font-smoothing:antialiased;overflow-x:clip;letter-spacing:-.01em}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 22px}
+.wide{max-width:1240px;margin:0 auto;padding:0 22px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.rv.in{opacity:1;transform:translateY(0)}
+[data-d="1"]{transition-delay:.06s}[data-d="2"]{transition-delay:.14s}[data-d="3"]{transition-delay:.22s}[data-d="4"]{transition-delay:.3s}
+
+.risk{background:var(--bg2);border-bottom:1px solid var(--line2);color:var(--ink2);font-size:12px;line-height:1.5;text-align:center;padding:8px 16px}
+.risk b{color:var(--ink);font-weight:600}
+
+.nav{position:sticky;top:0;z-index:50;height:52px;background:rgba(255,255,255,.78);backdrop-filter:saturate(200%) blur(24px);-webkit-backdrop-filter:saturate(200%) blur(24px);border-bottom:1px solid var(--line2)}
+.nav .in{max-width:1024px;margin:0 auto;height:100%;padding:0 22px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:700;font-size:18px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.logo .d{width:8px;height:8px;border-radius:50%;background:var(--accent2)}
+.nav nav{display:flex;gap:30px}
+.nav nav a{font-size:13px;color:var(--ink);opacity:.85;text-decoration:none;transition:.2s}
+.nav nav a:hover{opacity:1;color:var(--accent)}
+.pill{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;padding:8px 18px;border-radius:980px;text-decoration:none;transition:.25s var(--ease);border:none;cursor:pointer;font-family:var(--sans);letter-spacing:-.01em}
+.pill:hover{background:var(--accent2);transform:scale(1.02)}
+.pill.lg{font-size:17px;padding:14px 28px;box-shadow:0 6px 20px rgba(224,144,10,.35)}
+.lk{color:var(--accent);text-decoration:none;font-size:17px;display:inline-flex;align-items:center;gap:3px;transition:opacity .2s}
+.lk:hover{opacity:.7}.lk.lg{font-size:19px;font-weight:500}
+
+.hero{text-align:center;padding:0;background:linear-gradient(180deg,#fff 60%,#f5f5f7);min-height:100dvh;display:flex;align-items:center}
+.hero .wrap{padding-top:80px;padding-bottom:0;width:100%}
+.eye{font-size:17px;font-weight:600;color:var(--accent);letter-spacing:.01em;margin-bottom:8px}
+h1{font-size:clamp(52px,9.5vw,108px);font-weight:700;line-height:1.00;letter-spacing:-.03em;margin:8px auto 0;max-width:13ch}
+h1 .g{color:var(--ink3)}
+.subh{font-size:clamp(19px,2.6vw,26px);font-weight:400;color:var(--ink2);line-height:1.3;max-width:32ch;margin:24px auto 0;letter-spacing:-.01em}
+.hero-links{display:flex;gap:24px;justify-content:center;align-items:center;margin-top:36px;flex-wrap:wrap}
+.foot-note{margin-top:20px;font-size:13px;color:var(--ink3)}
+
+.stage{position:relative;margin-top:56px;padding-bottom:0;display:flex;justify-content:center}
+.stage::before{content:"";position:absolute;bottom:-60px;left:50%;transform:translateX(-50%);width:min(800px,96vw);height:380px;background:radial-gradient(55% 70% at 50% 20%,rgba(224,144,10,.11),transparent 70%);filter:blur(18px);z-index:0}
+/* phone reflection */
+.stage::after{content:"";position:absolute;bottom:-70px;left:50%;transform:translateX(-50%);width:260px;height:60px;background:radial-gradient(ellipse,rgba(0,0,0,.18),transparent 72%);filter:blur(16px);z-index:0}
+.phone{position:relative;z-index:1;width:320px;height:650px;border-radius:58px;background:linear-gradient(150deg,#3f3f41,#1c1c1e);padding:12px;box-shadow:0 70px 140px -50px rgba(0,0,0,.65),0 0 0 2px rgba(0,0,0,.08),0 0 0 1px rgba(255,255,255,.06) inset}
+.screen{position:relative;width:100%;height:100%;border-radius:44px;background:#0E121A;overflow:hidden}
+.island{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:96px;height:30px;background:#000;border-radius:18px;z-index:5}
+.sbar{display:flex;justify-content:space-between;align-items:center;padding:13px 24px 0;font-size:12px;color:#fff;font-weight:600;font-family:var(--mono)}
+.papp{padding:30px 18px 0;color:#EAF0F6}
+.papp-top{display:flex;align-items:center;gap:7px;font-weight:700;font-size:15px}
+.papp-top .d{width:7px;height:7px;border-radius:50%;background:var(--accent2);box-shadow:0 0 8px rgba(245,166,35,.6)}
+.bal-card{margin-top:16px;background:#131826;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px}
+.bal-card .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#5A6472;font-family:var(--mono)}
+.bal-card .v{font-family:var(--mono);font-weight:700;font-size:34px;color:var(--accent2);margin-top:6px;text-shadow:0 0 24px rgba(245,166,35,.35)}
+.bal-card .badge{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;color:#3FB950;border:1px solid rgba(63,185,80,.4);border-radius:20px;padding:3px 8px}
+.pspark{width:100%;height:46px;margin-top:14px;display:block}
+.qstats{display:flex;gap:10px;margin-top:14px}
+.qs{flex:1;background:#131826;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:12px}
+.qs .k{font-size:9px;color:#5A6472;font-family:var(--mono);letter-spacing:.06em}
+.qs .v{font-family:var(--mono);font-weight:600;font-size:15px;margin-top:4px}.qs .v.p{color:#3FB950}
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:62px;background:rgba(14,18,26,.9);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-around;align-items:center;padding-bottom:8px}
+.tabbar .t{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:8px;color:#5A6472;font-family:var(--mono)}
+.tabbar .t.on{color:var(--accent2)}.tabbar .t .ic{width:18px;height:18px;border-radius:5px;border:1.6px solid currentColor}
+
+/* trust bar */
+.trust{background:var(--bg2);padding:52px 0;border-top:1px solid var(--line2)}
+.trust .lbl{text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:26px}
+.trust .brokers{display:flex;justify-content:center;gap:46px;flex-wrap:wrap;margin-bottom:36px;opacity:.5;font-weight:700;font-size:21px;letter-spacing:-.02em}
+.tstats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;max-width:900px;margin:0 auto}
+.tstats .s{text-align:center;padding:0 20px;border-right:1px solid var(--line)}
+.tstats .s:last-child{border-right:none}
+.tstats .v{font-family:var(--mono);font-weight:700;font-size:clamp(28px,4vw,42px);letter-spacing:-.02em}
+.tstats .v .u{color:var(--accent);font-size:.55em;vertical-align:.12em}
+.tstats .l{font-size:13px;color:var(--ink2);margin-top:6px}
+
+section{padding:140px 0;text-align:center}
+.kick{font-size:21px;font-weight:600;color:var(--accent);margin-bottom:8px}
+h2{font-size:clamp(36px,6vw,72px);font-weight:700;line-height:1.03;letter-spacing:-.025em;max-width:17ch;margin:0 auto}
+h2 .g{color:var(--ink3)}
+.lead{font-size:clamp(19px,2.4vw,24px);font-weight:400;color:var(--ink2);max-width:36ch;margin:20px auto 0;line-height:1.4}
+
+/* feature deep-dive rows */
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;text-align:left;max-width:1080px;margin:0 auto;padding:0 22px}
+.feat.rev .ftext{order:2}
+.feat .kick{font-size:17px}
+.feat h3{font-size:clamp(30px,4.2vw,46px);font-weight:700;letter-spacing:-.022em;line-height:1.07}
+.feat h3 .g{color:var(--ink3)}
+.feat p{font-size:19px;color:var(--ink2);margin-top:18px;line-height:1.45}
+.feat ul{list-style:none;margin:22px 0 0;padding:0}
+.feat li{display:flex;gap:10px;padding:7px 0;font-size:16px;color:var(--ink)}
+.feat li .c{color:var(--accent);font-weight:700}
+.fvis{background:var(--bg2);border-radius:32px;padding:44px;min-height:360px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.fvis.dark{background:#0E121A;color:#EAF0F6}
+.fvis .big{font-family:var(--mono);font-weight:700;font-size:clamp(52px,7.5vw,84px);letter-spacing:-.03em;line-height:1}
+.fvis .big .u{color:var(--accent2);font-size:.5em;vertical-align:.2em}
+.fvis canvas{display:block;width:100%}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:64px;text-align:left}
+.tile{background:var(--bg2);border-radius:28px;padding:44px;transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.tile:hover{transform:translateY(-5px);box-shadow:0 40px 80px -40px rgba(0,0,0,.22)}
+.tile.span2{grid-column:span 2}.tile.dark{background:#000;color:#f5f5f7}
+.tile h3{font-size:28px;font-weight:700;letter-spacing:-.025em;margin-bottom:10px}
+.tile p{font-size:16px;color:var(--ink2);max-width:42ch;line-height:1.5}.tile.dark p{color:#a1a1a6}
+.tile .viz{margin-top:28px}.tile canvas{display:block;width:100%;height:80px}
+.tile .big{font-family:var(--mono);font-weight:700;font-size:clamp(44px,6.5vw,74px);letter-spacing:-.035em;line-height:1}.tile .big .u{color:var(--accent2);font-size:.5em;vertical-align:.2em}
+
+.dark-sec{background:#000;color:#f5f5f7;padding:150px 0}
+.dark-sec h2{color:#f5f5f7}.dark-sec .lead{color:#a1a1a6}.dark-sec .kick{color:var(--accent2)}
+.scope-card{max-width:920px;margin:60px auto 0;border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,#0E121A,#0a0d14);box-shadow:0 60px 120px -50px rgba(0,0,0,.8)}
+.scope-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.07);font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:#5A6472}
+.scope-bar .live{color:var(--accent2);display:inline-flex;align-items:center;gap:7px}
+.scope-bar .live .l{width:7px;height:7px;border-radius:50%;background:var(--accent2);box-shadow:0 0 10px rgba(245,166,35,.6);animation:bk 1.5s infinite}
+@keyframes bk{0%,55%{opacity:1}72%,100%{opacity:.25}}
+#scope{display:block;width:100%;height:300px;background:#080B11}
+
+/* interactive calculator */
+.calc-sec{background:var(--bg2);padding:140px 0}
+.calc-box{max-width:760px;margin:56px auto 0;background:#fff;border-radius:32px;padding:48px;box-shadow:0 40px 100px -50px rgba(0,0,0,.22);text-align:left}
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.calc-field{margin-bottom:24px}
+.calc-field label{display:flex;justify-content:space-between;font-size:14px;color:var(--ink2);margin-bottom:10px}
+.calc-field label b{font-family:var(--mono);color:var(--ink);font-weight:600}
+input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:5px;background:var(--line);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2);transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:active{transform:scale(1.15)}
+.tierseg{display:flex;gap:6px;background:var(--bg2);border-radius:12px;padding:5px}
+.tierseg button{flex:1;padding:10px;border:none;background:none;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--ink2);border-radius:9px;cursor:pointer;transition:.18s}
+.tierseg button.on{background:var(--accent);color:#fff}
+.calc-result{background:linear-gradient(165deg,#11161f,#0b0f17);border-radius:22px;padding:34px;text-align:center;color:#EAF0F6}
+.calc-result .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5A6472}
+.calc-result .y{font-family:var(--mono);font-weight:700;font-size:54px;color:var(--accent2);letter-spacing:-.03em;line-height:1;margin:8px 0;text-shadow:0 0 30px rgba(245,166,35,.35)}
+.calc-result .m{font-size:14px;color:#9BA6B4}
+
+/* security cards */
+.sec3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:56px;text-align:left}
+.scard{background:var(--bg2);border-radius:24px;padding:34px}
+.scard .ic{width:48px;height:48px;border-radius:13px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;margin-bottom:18px}
+.scard .ic svg{width:24px;height:24px;stroke:currentColor;stroke-width:1.9;fill:none}
+.scard h3{font-size:20px;font-weight:600;margin-bottom:8px}
+.scard p{font-size:15px;color:var(--ink2)}
+
+/* comparison */
+.cmp{max-width:760px;margin:54px auto 0;border-radius:24px;overflow:hidden;border:1px solid var(--line);text-align:left}
+.cmp .r{display:grid;grid-template-columns:1.4fr 1fr 1fr;border-bottom:1px solid var(--line)}
+.cmp .r:last-child{border-bottom:none}
+.cmp .c{padding:16px 18px;font-size:14px;display:flex;align-items:center}
+.cmp .head{background:var(--bg2);font-weight:600}
+.cmp .head .reb{color:var(--accent)}
+.cmp .c.feat{color:var(--ink2)}
+.cmp .yes{color:var(--green);font-weight:600}.cmp .no{color:var(--ink3)}
+.cmp .reb-col{background:rgba(224,144,10,.05)}
+
+/* tiers */
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:840px;margin:60px auto 0;text-align:left}
+.tcard{background:var(--bg2);border-radius:28px;padding:44px}.tcard.vip{background:#000;color:#f5f5f7}
+.tcard h3{font-size:24px;font-weight:600}
+.tcard .price{font-family:var(--mono);font-weight:700;font-size:48px;letter-spacing:-.03em;margin:10px 0 4px}
+.tcard .price .u{color:var(--accent);font-size:.45em;vertical-align:.3em}.tcard.vip .price .u{color:var(--accent2)}
+.tcard .per{font-size:14px;color:var(--ink2)}.tcard.vip .per{color:#a1a1a6}
+.tcard ul{list-style:none;margin:24px 0 0;padding:0}
+.tcard li{font-size:15px;padding:9px 0;border-top:1px solid var(--line);display:flex;gap:9px;color:var(--ink2)}
+.tcard.vip li{border-color:rgba(255,255,255,.12);color:#d2d2d7}
+.tcard li .ck{color:var(--accent)}.tcard.vip li .ck{color:var(--accent2)}
+
+.faq{max-width:720px;margin:56px auto 0;text-align:left;border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{padding:26px 4px;cursor:pointer;font-size:21px;font-weight:600;letter-spacing:-.018em;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:18px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .pm{color:var(--accent);font-weight:400;font-size:26px;transition:transform .3s var(--ease)}
+.faq details[open] summary .pm{transform:rotate(45deg)}
+.faq .ans{padding:0 4px 26px;font-size:17px;color:var(--ink2);max-width:62ch}
+
+.cta-sec{padding:160px 0;background:#000;color:#f5f5f7}
+.cta-sec h2{color:#f5f5f7}.cta-sec .g{color:#6e6e73}
+footer{background:#f5f5f7;border-top:1px solid var(--line2);padding:52px 0 60px;text-align:left}
+.foot-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;max-width:1024px;margin:0 auto 30px;padding:0 22px}
+.foot-cols h4{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:12px}
+.foot-cols a{display:block;font-size:12px;color:var(--ink2);text-decoration:none;padding:5px 0}.foot-cols a:hover{color:var(--ink)}
+.fineprint{max-width:1024px;margin:0 auto;padding:24px 22px 0;border-top:1px solid var(--line);font-size:12px;line-height:1.6;color:var(--ink3)}
+.fineprint b{color:var(--ink2);font-weight:600}.fineprint p{margin-bottom:12px}
+
+@media (max-width:834px){
+  .nav nav{display:none}
+  section{padding:96px 0}
+  .hero{min-height:auto;padding-top:0}
+  .hero .wrap{padding-top:60px}
+  .feat{grid-template-columns:1fr;gap:32px}.feat.rev .ftext{order:0}
+  .bento{grid-template-columns:1fr}.tile.span2{grid-column:span 1}
+  .tile{padding:32px}
+  .tiers,.calc-grid,.sec3{grid-template-columns:1fr}.sec3{gap:14px}
+  .tstats{grid-template-columns:1fr 1fr;gap:24px 0}.tstats .s:nth-child(2){border-right:none}
+  .foot-cols{grid-template-columns:1fr 1fr}.calc-box{padding:28px}
+  .cmp .c{padding:13px 12px;font-size:13px}
+  .phone{width:280px;height:572px;border-radius:50px}
+  .screen{border-radius:40px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="risk">A CFD/forex kereskedés magas kockázattal jár — <b>tőkéd elveszítheted</b>. A retail számlák [74%]-a veszít. Nem befektetési tanács · Tools, not tips.</div>
+
+<header class="nav"><div class="in">
+  <div class="logo"><span class="d"></span>Rebound</div>
+  <nav><a href="#features">Funkciók</a><a href="#calc">Kalkulátor</a><a href="#security">Biztonság</a><a href="#tiers">Szintek</a><a href="#faq">GYIK</a></nav>
+  <a href="https://t.me/ReboundBot" target="_blank" rel="noopener" class="pill">Indítás</a>
+</div></header>
+
+<main>
+<!-- HERO -->
+<section class="hero"><div class="wrap">
+  <div class="eye rv in">Rebound</div>
+  <h1 class="rv in" data-d="1">Minden lot visszapattan.<br><span class="g">Készpénzben.</span></h1>
+  <p class="subh rv in" data-d="2">A kereskedésed költségének egy része valódi készpénzként kerül vissza a tárcádba. Nem trade-locked.</p>
+  <div class="hero-links rv in" data-d="3">
+    <a href="https://t.me/ReboundBot" target="_blank" rel="noopener" class="pill lg">Indítás Telegramon</a>
+    <a href="#features" class="lk lg">Mit kapsz <span class="c">›</span></a>
+  </div>
+  <div class="foot-note rv in" data-d="4">Kifizethető $20-tól · USDC vagy bank · Tools, not tips</div>
+  <div class="stage rv" data-d="2">
+    <div class="phone"><div class="screen">
+      <div class="island"></div>
+      <div class="sbar"><span>9:41</span><span>5G&nbsp;&nbsp;￪&nbsp;&nbsp;100%</span></div>
+      <div class="papp">
+        <div class="papp-top"><span class="d"></span>Rebound</div>
+        <div class="bal-card"><div class="k">Kifizethető egyenleg</div><div class="v" id="pbal">$247.60</div><span class="badge">● CASH · NEM TRADE-LOCKED</span><canvas class="pspark" id="pspark"></canvas></div>
+        <div class="qstats"><div class="qs"><div class="k">FOLYÓ HÓNAP</div><div class="v p">+$38.40</div></div><div class="qs"><div class="k">RATE</div><div class="v">$1.20/lot</div></div></div>
+      </div>
+      <div class="tabbar"><div class="t on"><span class="ic"></span>Wallet</div><div class="t"><span class="ic"></span>Napló</div><div class="t"><span class="ic"></span>Coach</div><div class="t"><span class="ic"></span>Profil</div></div>
+    </div></div>
+  </div>
+</div></section>
+
+<!-- TRUST BAR -->
+<div class="trust"><div class="wide">
+  <div class="lbl rv">Read-only kapcsolat · vezető platformokkal</div>
+  <div class="brokers rv" data-d="1"><span>IB API</span><span>MetaTrader 4</span><span>MetaTrader 5</span><span>cTrader</span></div>
+  <div class="tstats rv" data-d="2">
+    <div class="s"><div class="v"><span class="u">$</span>1.20<span class="u">+</span></div><div class="l">rebate / lot</div></div>
+    <div class="s"><div class="v"><span class="u">$</span>20</div><div class="l">min. kifizetés</div></div>
+    <div class="s"><div class="v">0</div><div class="l">trade-lock</div></div>
+    <div class="s"><div class="v">T+0</div><div class="l">jóváírás</div></div>
+  </div>
+</div></div>
+
+<!-- FEATURES INTRO -->
+<section id="features" style="padding-bottom:40px"><div class="wrap">
+  <div class="kick rv">A termék</div>
+  <h2 class="rv" data-d="1">Nem ígéret.<br><span class="g">Műszerfal.</span></h2>
+  <p class="lead rv" data-d="2">Négy eszköz, ami a kereskedésed mellé áll — a tárcádtól a kockázatkezelésig.</p>
+</div></section>
+
+<!-- FEATURE 1: WALLET -->
+<section style="padding:60px 0"><div class="feat rv">
+  <div class="ftext"><div class="kick">Rebate wallet</div>
+    <h3>Készpénz.<br><span class="g">Nem pont.</span></h3>
+    <p>Minden zárt lot után automatikus a cash rebate. A tárcád egyenlege valódi pénz — bármikor kiveheted $20-tól, USDC-ben vagy banki átutalással.</p>
+    <ul><li><span class="c">✓</span> Soha nem trade-locked</li><li><span class="c">✓</span> Append-only főkönyv — minden tétel auditálható</li><li><span class="c">✓</span> USDC (BEP-20) vagy SEPA</li></ul>
+  </div>
+  <div class="fvis dark"><div class="mono" style="font-size:11px;letter-spacing:.1em;color:#5A6472">KIFIZETHETŐ EGYENLEG</div><div class="big"><span class="u">$</span>247.60</div><span style="display:inline-block;margin-top:14px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#3FB950;border:1px solid rgba(63,185,80,.4);border-radius:20px;padding:4px 10px">● CASH · NEM TRADE-LOCKED</span></div>
+</div></section>
+
+<!-- FEATURE 2: JOURNAL -->
+<section style="padding:60px 0"><div class="feat rev rv">
+  <div class="ftext"><div class="kick">Kereskedési napló</div>
+    <h3>Minden kötésed,<br><span class="g">egy helyen.</span></h3>
+    <p>Win-rate, R:R, drawdown, és revenge-trading riasztás. Lásd a mintáidat — és a rebate-et minden kötés mellett.</p>
+    <ul><li><span class="c">✓</span> Automatikus broker-szinkron (read-only)</li><li><span class="c">✓</span> Revenge-trading figyelmeztetés</li><li><span class="c">✓</span> Per-kötés rebate kimutatás</li></ul>
+  </div>
+  <div class="fvis"><canvas id="fJournal" style="height:200px"></canvas></div>
+</div></section>
+
+<!-- FEATURE 3: RISK COACH -->
+<section style="padding:60px 0"><div class="feat rv">
+  <div class="ftext"><div class="kick">Risk coach</div>
+    <h3>Védőháló,<br><span class="g">ha kell.</span></h3>
+    <p>Napi veszteséglimit és guardrailök. A coach figyelmeztet, nem dönt helyetted — de megállít, mielőtt a nap rosszra fordul.</p>
+    <ul><li><span class="c">✓</span> Napi loss-limit lock</li><li><span class="c">✓</span> Max lot / kötés megerősítés</li><li><span class="c">✓</span> Revenge-cooldown (BEGINNER védelem)</li></ul>
+  </div>
+  <div class="fvis"><canvas id="fGauge" style="height:200px"></canvas></div>
+</div></section>
+
+<!-- TOOLS BENTO -->
+<section id="tools"><div class="wide">
+  <div class="kick rv">Egy app, négy műszer</div>
+  <h2 class="rv" data-d="1">Minden a fegyelmezett<br>kereskedéshez.</h2>
+  <div class="bento">
+    <div class="tile span2 dark rv" data-d="1"><h3>Rebate wallet</h3><p>Élő, kifizethető egyenleg — soha nem trade-locked. Append-only főkönyv.</p><div class="viz"><div class="big"><span class="u">$</span>247.60</div></div></div>
+    <div class="tile rv" data-d="2"><h3>Napló</h3><p>Win-rate, R:R, drawdown, revenge-jel.</p><div class="viz"><canvas data-i="bars"></canvas></div></div>
+    <div class="tile rv" data-d="3"><h3>Risk coach</h3><p>Napi limit és guardrailök.</p><div class="viz"><canvas data-i="gauge"></canvas></div></div>
+    <div class="tile span2 rv" data-d="2"><h3>Pozíció-kalkulátor</h3><p>Lot-méret a kockázat %-ából, azonnali rebate-becsléssel.</p><div class="viz"><canvas data-i="pulse" style="height:60px"></canvas></div></div>
+  </div>
+</div></section>
+
+<!-- PRECISION (dark) -->
+<section class="dark-sec" id="precision"><div class="wrap">
+  <div class="kick rv">Precizitás</div>
+  <h2 class="rv" data-d="1">Műszer-pontosság.<br><span class="g">Beépítve.</span></h2>
+  <p class="lead rv" data-d="2">Valós idejű rebate-követés, minden lotot pontosan elszámolva — broker-visszaigazolt adatból.</p>
+</div>
+  <div class="wrap"><div class="scope-card rv" data-d="2"><div class="scope-bar"><span>CH-01 · REBATE / LOT — THERMAL TRACE</span><span class="live"><span class="l"></span>LIVE</span></div><canvas id="scope"></canvas></div></div>
+</section>
+
+<!-- INTERACTIVE CALCULATOR -->
+<section class="calc-sec" id="calc"><div class="wrap">
+  <div class="kick rv">Kalkulátor</div>
+  <h2 class="rv" data-d="1">Mennyi pattan<br>vissza neked?</h2>
+  <p class="lead rv" data-d="2">Húzd a csúszkát a havi lot-volumeneddel. Élőben számol.</p>
+  <div class="calc-box rv" data-d="2"><div class="calc-grid">
+    <div>
+      <div class="calc-field"><label>Havi lot-volumen <b id="lotOut">25 lot</b></label><input type="range" id="lotRange" min="1" max="200" value="25"></div>
+      <div class="calc-field"><label style="margin-bottom:10px">Szint</label><div class="tierseg" id="tierSeg"><button class="on" data-r="1.20">Standard · $1.20</button><button data-r="1.60">VIP · $1.60</button></div></div>
+      <p style="font-size:13px;color:var(--ink3);margin-top:6px">A becslés a megadott rátán, broker-visszaigazolt volumenre. Nem befektetési tanács.</p>
+    </div>
+    <div class="calc-result">
+      <div class="k">Becsült éves cashback</div>
+      <div class="y" id="calcYear">$360</div>
+      <div class="m"><span id="calcMonth">$30</span> / hó · <span id="calcLot">$1.20</span>/lot</div>
+    </div>
+  </div></div>
+</div></section>
+
+<!-- MECHANIC -->
+<section><div class="wrap">
+  <div class="kick rv">A mechanika</div>
+  <h2 class="rv" data-d="1">Honnan pattan vissza?</h2>
+  <p class="lead rv" data-d="2">A broker a kereskedésed után jutalékot fizet nekünk. Ennek nagy részét visszaosztjuk neked — cash rebate-ként.</p>
+  <div class="calc-box rv" data-d="2" style="max-width:680px;text-align:left">
+    <div style="display:flex;justify-content:space-between;font-size:15px;color:var(--ink2);margin-bottom:10px"><span>Broker RevShare / lot</span><b class="mono" style="color:var(--ink)">$2.40</b></div>
+    <div style="height:16px;border-radius:10px;background:var(--line2);overflow:hidden;margin-bottom:24px"><i style="display:block;height:100%;border-radius:10px;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1.2s var(--ease)" data-w="100%"></i></div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;color:var(--ink2);margin-bottom:10px"><span>↳ Visszapattan hozzád</span><b class="mono" style="color:var(--accent)">$1.20 / lot</b></div>
+    <div style="height:16px;border-radius:10px;background:var(--line2);overflow:hidden;margin-bottom:24px"><i style="display:block;height:100%;border-radius:10px;width:0;background:linear-gradient(90deg,var(--accent2),#ffce6b);transition:width 1.2s var(--ease)" data-w="50%"></i></div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;color:var(--green)"><span>Kifizethető, nem trade-locked</span><b class="mono" style="color:var(--green)">100%</b></div>
+  </div>
+  <p class="mono rv" style="font-size:12px;color:var(--ink3);margin-top:18px">Affiliate jutalék visszaosztása · jutalom csak broker-megerősített FTD + minősítő volumen után</p>
+</div></section>
+
+<!-- SECURITY -->
+<section id="security" style="background:var(--bg2)"><div class="wide">
+  <div class="kick rv">Biztonság &amp; bizalom</div>
+  <h2 class="rv" data-d="1">A pénzed és az<br>adataid védve.</h2>
+  <div class="sec3">
+    <div class="scard rv" data-d="1"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Read-only hozzáférés</h3><p>Investor jelszó vagy IB API — megbízást sosem adunk a neveden. Kereskedni csak te tudsz.</p></div>
+    <div class="scard rv" data-d="2"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></div><h3>Append-only főkönyv</h3><p>Minden jóváírás és kifizetés megváltoztathatatlan tételként rögzül. Teljesen auditálható.</p></div>
+    <div class="scard rv" data-d="3"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>EU-régió · GDPR</h3><p>Az adatfeldolgozás EU régióban, GDPR szerint. A rebate az affiliate jutalék átlátható visszaosztása.</p></div>
+  </div>
+</div></section>
+
+<!-- COMPARISON -->
+<section><div class="wrap">
+  <div class="kick rv">Miért más</div>
+  <h2 class="rv" data-d="1">Cashback. Nem<br><span class="g">csali-bónusz.</span></h2>
+  <div class="cmp rv" data-d="2">
+    <div class="r head"><div class="c">&nbsp;</div><div class="c reb reb-col">Rebound</div><div class="c">Broker bónusz</div></div>
+    <div class="r"><div class="c feat">Készpénz, kivehető</div><div class="c reb-col yes">✓ mindig</div><div class="c no">✗ trade-locked</div></div>
+    <div class="r"><div class="c feat">Volumen-feltétel a kivételhez</div><div class="c reb-col yes">✓ nincs</div><div class="c no">✗ x40 forgalom</div></div>
+    <div class="r"><div class="c feat">Read-only, nincs megbízás</div><div class="c reb-col yes">✓</div><div class="c no">—</div></div>
+    <div class="r"><div class="c feat">Napló + risk coach</div><div class="c reb-col yes">✓</div><div class="c no">✗</div></div>
+    <div class="r"><div class="c feat">Átlátható forrás (affiliate)</div><div class="c reb-col yes">✓ közölt</div><div class="c no">~ rejtett</div></div>
+  </div>
+</div></section>
+
+<!-- TIERS -->
+<section id="tiers" style="background:var(--bg2)"><div class="wrap">
+  <div class="kick rv">Szintek</div>
+  <h2 class="rv" data-d="1">Átlátható ráták.<br><span class="g">Semmi apró betű.</span></h2>
+  <div class="tiers">
+    <div class="tcard rv" data-d="1"><h3>Standard</h3><div class="price"><span class="u">$</span>1.20</div><div class="per">/ lot · cash rebate</div>
+      <ul><li><span class="ck">✓</span> Kifizethető, nem trade-locked</li><li><span class="ck">✓</span> $20 min. kifizetés (USDC / bank)</li><li><span class="ck">✓</span> Welcome $100 · Referral $80 (FTD után)</li><li><span class="ck">✓</span> Napló + risk coach + kalkulátor</li></ul></div>
+    <div class="tcard vip rv" data-d="2"><h3>VIP</h3><div class="price"><span class="u">$</span>1.60</div><div class="per">/ lot · cash rebate</div>
+      <ul><li><span class="ck">✓</span> Minden a Standardból</li><li><span class="ck">✓</span> Magasabb rebate ráta</li><li><span class="ck">✓</span> Prioritásos kifizetés</li><li><span class="ck">✓</span> Prioritásos támogatás</li></ul></div>
+  </div>
+</div></section>
+
+<!-- FAQ -->
+<section id="faq"><div class="wrap">
+  <div class="kick rv">GYIK</div>
+  <h2 class="rv" data-d="1">Amit tudni érdemes.</h2>
+  <div class="faq rv" data-d="2">
+    <details open><summary>Tényleg kifizethető a rebate?<span class="pm">+</span></summary><div class="ans">Igen. A rebate cash jellegű jóváírás a tárcádban, $20-tól kifizethető USDC-ben vagy banki átutalással. Soha nem köti további kereskedéshez — nem trade-locked.</div></details>
+    <details><summary>Hozzáfértek a számlámhoz?<span class="pm">+</span></summary><div class="ans">Nem. Kizárólag read-only (investor) hozzáférést vagy IB API-t használunk a volumen olvasásához. Megbízást soha nem adunk a neveden.</div></details>
+    <details><summary>Melyik brokerekkel működik?<span class="pm">+</span></summary><div class="ans">IB API, MetaTrader 4/5 (investor jelszóval), és cTrader. Ha egyik sem elérhető, statement-feltöltés is lehet — ezt manuálisan ellenőrizzük.</div></details>
+    <details><summary>Mikor jár a welcome / referral jutalom?<span class="pm">+</span></summary><div class="ans">Kizárólag broker-megerősített első befizetés (FTD) és a minősítő kereskedési volumen után. Puszta regisztráció csak XP-t ad, készpénzt nem.</div></details>
+    <details><summary>Mibe kerül? Van rejtett díj?<span class="pm">+</span></summary><div class="ans">A Rebound használata ingyenes. A bevételünk a broker RevShare — ennek nagy részét rebate-ként visszaadjuk. A forrást egyértelműen közöljük (affiliate disclosure).</div></details>
+    <details><summary>Ez befektetési tanács?<span class="pm">+</span></summary><div class="ans">Nem. A Rebound eszközöket kínál — naplót, kalkulátort, risk coachot, cashback-követést. Nem ad jelzéseket és nem ígér hozamot. A CFD/forex kereskedés magas kockázattal jár.</div></details>
+  </div>
+</div></section>
+
+<!-- CTA -->
+<section class="cta-sec"><div class="wrap">
+  <h2 class="rv">A spreaded egy része<br><span class="g">visszajár.</span></h2>
+  <div class="hero-links rv" data-d="1" style="margin-top:34px">
+    <a href="https://t.me/ReboundBot" target="_blank" rel="noopener" class="pill lg">Megnyitás Telegramon</a>
+    <a href="#features" class="lk lg">Tudj meg többet <span class="c">›</span></a>
+  </div>
+</div></section>
+</main>
+
+<footer>
+  <div class="foot-cols">
+    <div><h4>Termék</h4><a href="#features">Funkciók</a><a href="#tools">Eszközök</a><a href="#calc">Kalkulátor</a><a href="#precision">Precizitás</a></div>
+    <div><h4>Szintek</h4><a href="#tiers">Standard</a><a href="#tiers">VIP</a><a href="#security">Biztonság</a><a href="#faq">GYIK</a></div>
+    <div><h4>Jogi</h4><a href="#">ÁSZF</a><a href="#">Adatvédelem (GDPR)</a><a href="#">Kockázati tájékoztató</a><a href="#">Affiliate disclosure</a></div>
+    <div><h4>Kapcsolat</h4><a href="https://t.me/ReboundBot" target="_blank" rel="noopener">Telegram</a><a href="mailto:support@rebound.app">support@rebound.app</a></div>
+  </div>
+  <div class="fineprint">
+    <p><b>Kockázati figyelmeztetés.</b> A CFD-ek és devizapárok kereskedése spekulatív és tőkeáttételes termék, amely a befektetett tőke teljes elvesztésével járhat. A kiskereskedelmi CFD-számlák [74%]-a veszít pénzt ennél a szolgáltatónál. Győződj meg róla, hogy megérted a kockázatokat. Ez nem befektetési tanács — a Rebound eszközöket kínál, nem javaslatokat.</p>
+    <p><b>Affiliate közlés.</b> A Rebound affiliate jutalékot kap a partner-broker(ek)től; a felhasználónak fizetett rebate ennek a jutaléknak a visszaosztása. A Rebound nem független a brokertől a jutalék mértékéig. Csak engedélyezett brokerrel és engedélyezett célpiacon érhető el.</p>
+    <p>Jutalom kizárólag broker-megerősített első befizetés (FTD) és minősítő kereskedési volumen után szabadul fel; clawback aktív CPA-visszavonás esetén. EU-régió · GDPR. © 2026 Rebound. Minden jog fenntartva.</p>
+  </div>
+</footer>
+
+<script>
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function revealEl(el){el.classList.add('in');}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){revealEl(e.target);io.unobserve(e.target);}}),{threshold:0,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rv:not(.in)').forEach(el=>io.observe(el));
+// fallback: reveal any still-hidden .rv after 3s (handles iOS edge cases)
+setTimeout(()=>document.querySelectorAll('.rv:not(.in)').forEach(revealEl),3000);
+const io2=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('[data-w]').forEach(b=>requestAnimationFrame(()=>b.style.width=b.dataset.w));io2.unobserve(e.target);}}),{threshold:0,rootMargin:'0px 0px -20px 0px'});
+document.querySelectorAll('[data-w]').forEach(el=>io2.observe(el.closest('section')||el));
+
+// phone sparkline
+(function(){const c=document.getElementById('pspark');if(!c)return;const x=c.getContext('2d'),dpr=2,W=c.clientWidth,H=c.clientHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);x.strokeStyle='#F5A623';x.lineWidth=2;x.shadowColor='rgba(245,166,35,.6)';x.shadowBlur=8;x.beginPath();[.4,.46,.42,.55,.5,.6,.57,.68,.64,.78,.82].forEach((v,i,a)=>{const px=i/(a.length-1)*W,py=H-v*H;i?x.lineTo(px,py):x.moveTo(px,py);});x.stroke();})();
+
+// feature journal chart
+function fJournalDraw(){const c=document.getElementById('fJournal');if(!c||c._d)return;c._d=1;const x=c.getContext('2d'),dpr=2,W=c.clientWidth,H=c.clientHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);
+  const v=[.5,.8,.35,.92,.58,.74,.5,.85,.66];const bw=W/(v.length*1.5);v.forEach((h,i)=>{x.fillStyle='rgba(224,144,10,'+(.35+h*.55)+')';const bx=i*(bw*1.5)+bw*.25,bh=h*(H-20);x.beginPath();x.roundRect(bx,H-bh,bw,bh,4);x.fill();});}
+// feature gauge
+function fGaugeDraw(){const c=document.getElementById('fGauge');if(!c||c._d)return;c._d=1;const x=c.getContext('2d'),dpr=2,W=c.clientWidth,H=c.clientHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);
+  const cx=W/2,cy=H*.82,r=Math.min(W*.32,H*.62);x.lineWidth=14;x.lineCap='round';x.strokeStyle='rgba(0,0,0,.08)';x.beginPath();x.arc(cx,cy,r,Math.PI,0);x.stroke();x.strokeStyle='#E0900A';x.beginPath();x.arc(cx,cy,r,Math.PI,Math.PI*1.62);x.stroke();
+  x.fillStyle='#1d1d1f';x.font='700 30px '+getComputedStyle(document.body).fontFamily;x.textAlign='center';x.fillText('42%',cx,cy-6);}
+const featIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){if(e.target.id==='fJournal')fJournalDraw();if(e.target.id==='fGauge')fGaugeDraw();}}),{threshold:0,rootMargin:'0px 0px -20px 0px'});
+['fJournal','fGauge'].forEach(id=>{const el=document.getElementById(id);if(el)featIO.observe(el);});
+
+// bento canvases
+document.querySelectorAll('canvas[data-i]').forEach(c=>{const x=c.getContext('2d'),dpr=2,W=c.clientWidth,H=c.clientHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);x.strokeStyle='#E0900A';x.fillStyle='#E0900A';const t=c.dataset.i;
+  if(t==='bars'){const v=[.45,.8,.32,.92,.58,.74,.5];const bw=W/(v.length*1.5);v.forEach((h,i)=>{x.globalAlpha=.4+h*.6;x.fillRect(i*(bw*1.5)+bw*.25,H-h*H,bw,h*H);});x.globalAlpha=1;}
+  if(t==='gauge'){x.lineWidth=6;x.strokeStyle='rgba(224,144,10,.18)';x.beginPath();x.arc(W/2,H*.92,H*.62,Math.PI,0);x.stroke();x.strokeStyle='#E0900A';x.beginPath();x.arc(W/2,H*.92,H*.62,Math.PI,Math.PI*1.66);x.stroke();}
+  if(t==='pulse'){x.lineWidth=2.4;x.shadowColor='rgba(224,144,10,.5)';x.shadowBlur=8;x.beginPath();for(let px=0;px<=W;px++){const py=H/2-Math.sin(px/W*Math.PI*4)*Math.exp(-Math.abs(px-W/2)/50)*H*.4;px?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();}});
+
+// interactive calculator
+let cRate=1.20;
+function calcUpdate(){const lots=+document.getElementById('lotRange').value;document.getElementById('lotOut').textContent=lots+' lot';
+  const month=lots*cRate,year=month*12;
+  document.getElementById('calcYear').textContent='$'+Math.round(year).toLocaleString('en-US');
+  document.getElementById('calcMonth').textContent='$'+month.toFixed(0);
+  document.getElementById('calcLot').textContent='$'+cRate.toFixed(2);}
+document.getElementById('lotRange').addEventListener('input',calcUpdate);
+document.getElementById('tierSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('#tierSeg button').forEach(x=>x.classList.toggle('on',x===b));cRate=+b.dataset.r;calcUpdate();});
+calcUpdate();
+
+// dark oscilloscope
+(function(){const c=document.getElementById('scope');if(!c)return;const ctx=c.getContext('2d');let W,H,dpr;function size(){dpr=Math.min(2,devicePixelRatio||1);W=c.clientWidth;H=c.clientHeight;c.width=W*dpr;c.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);}size();addEventListener('resize',size);
+  const N=180,buf=[];let seed=.5;for(let i=0;i<N;i++)buf.push(.5);let reveal=RM?N:0;
+  function grid(){ctx.clearRect(0,0,W,H);ctx.strokeStyle='rgba(245,166,35,.06)';ctx.lineWidth=1;const gx=W/14,gy=H/6;ctx.beginPath();for(let xx=0;xx<=W+1;xx+=gx){ctx.moveTo(xx,0);ctx.lineTo(xx,H);}for(let yy=0;yy<=H+1;yy+=gy){ctx.moveTo(0,yy);ctx.lineTo(W,yy);}ctx.stroke();ctx.strokeStyle='rgba(245,166,35,.14)';ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();}
+  function frame(){seed+=(Math.random()-.5)*.12+(.5-seed)*.03;seed=Math.max(.08,Math.min(.92,seed));buf.push(seed);if(buf.length>N)buf.shift();if(reveal<N)reveal+=3;grid();const step=W/(N-1),draw=Math.min(reveal,buf.length);ctx.lineJoin='round';ctx.lineCap='round';ctx.shadowColor='rgba(245,166,35,.9)';ctx.shadowBlur=14;ctx.strokeStyle='#F5A623';ctx.lineWidth=2.2;ctx.beginPath();for(let i=0;i<draw;i++){const xx=i*step,yy=H-(buf[buf.length-draw+i]*(H-34)+17);i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy);}ctx.stroke();ctx.shadowBlur=0;const lx=(draw-1)*step,ly=H-(buf[buf.length-1]*(H-34)+17);ctx.lineTo(lx,H);ctx.lineTo(0,H);ctx.closePath();const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(245,166,35,.13)');g.addColorStop(1,'rgba(245,166,35,0)');ctx.fillStyle=g;ctx.fill();ctx.shadowColor='rgba(255,200,80,1)';ctx.shadowBlur=18;ctx.fillStyle='#FFC24B';ctx.beginPath();ctx.arc(lx,ly,3.4,0,7);ctx.fill();ctx.shadowBlur=0;if(!RM)requestAnimationFrame(frame);}
+  if(RM){for(let i=0;i<120;i++){seed+=(Math.random()-.5)*.12+(.5-seed)*.03;buf.push(Math.max(.08,Math.min(.92,seed)));if(buf.length>N)buf.shift();}frame();}else{const ob=new IntersectionObserver(es=>{if(es[0].isIntersecting){requestAnimationFrame(frame);ob.disconnect();}},{threshold:0,rootMargin:'0px 0px -20px 0px'});ob.observe(c);}
+})();
+</script>
+</body>
+</html>

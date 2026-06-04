@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>Rebound — Mini App</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23F5A623'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000; --app:#0A0A0A; --s1:#141414; --s2:#1A1A1A; --el:#242424;
+  --bd:rgba(255,255,255,.08); --bd2:rgba(255,255,255,.14); --bda:rgba(245,166,35,.24);
+  --ink:#F2F2F7; --ink2:#8E8E93; --ink3:#48484A;
+  --amber:#F5A623; --amber2:#FFB94D;
+  --ag:rgba(245,166,35,.14); --as:rgba(245,166,35,.09);
+  --green:#34D058; --gs:rgba(52,208,88,.12); --red:#FF453A; --rs:rgba(255,69,58,.12);
+  --sans:"SF Pro Display",-apple-system,BlinkMacSystemFont,"Figtree",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1); --spring:cubic-bezier(.34,1.56,.64,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:#000;
+  color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;display:flex;justify-content:center;align-items:flex-start;
+}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ── shell ── */
+.app{
+  position:relative;width:100%;max-width:430px;min-height:100vh;
+  background:var(--app);overflow:hidden;display:flex;flex-direction:column;
+}
+/* scanline texture */
+.app::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 4px);
+}
+@media(min-width:480px){
+  body{padding:32px 0;background:#000}
+  .app{min-height:calc(100vh - 64px);border-radius:44px;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 70px 160px -50px rgba(0,0,0,.95)}
+}
+
+/* ── top bar ── */
+.top{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px 13px;
+  padding-top:max(env(safe-area-inset-top),16px);
+  background:linear-gradient(180deg,var(--app) 70%,rgba(7,12,22,0));
+  border-bottom:1px solid var(--bd);
+}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:17px;letter-spacing:-.025em}
+.brand .dot{
+  width:9px;height:9px;border-radius:50%;background:var(--amber);
+  box-shadow:0 0 0 3px rgba(245,166,35,.18),0 0 14px rgba(245,166,35,.55);
+  animation:pdot 2.8s ease-in-out infinite;
+}
+@keyframes pdot{
+  0%,100%{box-shadow:0 0 0 3px rgba(245,166,35,.18),0 0 14px rgba(245,166,35,.55)}
+  50%{box-shadow:0 0 0 5px rgba(245,166,35,.09),0 0 24px rgba(245,166,35,.8)}
+}
+.chip{
+  font-family:var(--mono);font-size:10px;letter-spacing:.07em;color:var(--ink2);
+  background:rgba(255,255,255,.04);border:1px solid var(--bd2);border-radius:20px;padding:5px 11px;
+}
+
+/* ── scroll ── */
+.scroll{flex:1;overflow-y:auto;padding:16px 16px 96px;-webkit-overflow-scrolling:touch;position:relative;z-index:2}
+.screen{display:none}
+.screen.on{display:block;animation:scr .32s var(--ease)}
+@keyframes scr{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+/* ── cards ── */
+.card{
+  background:var(--s1);border:1px solid var(--bd);border-radius:20px;
+  padding:18px;margin-bottom:12px;position:relative;overflow:hidden;
+}
+.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.09),transparent);
+}
+
+/* hero wallet card */
+.hero-card{
+  background:linear-gradient(155deg,#1C1C1E 0%,#111114 55%,#0A0A0A 100%);
+  border-color:rgba(255,255,255,.12);padding:22px;
+}
+.hero-card::after{
+  content:"";position:absolute;right:-50px;top:-50px;
+  width:220px;height:220px;
+  background:radial-gradient(circle,rgba(245,166,35,.14),transparent 68%);
+  pointer-events:none;
+}
+
+.k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+
+.bal{
+  font-family:var(--mono);font-weight:700;font-size:54px;
+  letter-spacing:-.03em;color:var(--amber);line-height:1;margin-top:10px;
+  text-shadow:0 0 50px rgba(245,166,35,.45),0 0 100px rgba(245,166,35,.18);
+}
+
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;
+  color:var(--green);background:var(--gs);
+  border:1px solid rgba(52,208,88,.26);border-radius:20px;padding:5px 11px;margin-top:14px;
+}
+
+.spark{width:100%;height:56px;display:block;margin-top:16px}
+
+/* mini stat cells */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.mini{background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:14px;padding:12px}
+.mini .k{font-size:9px}
+.mini .v{font-family:var(--mono);font-weight:700;font-size:19px;margin-top:6px;letter-spacing:-.01em}
+.mini .v.pos{color:var(--green)} .mini .v.neg{color:var(--red)} .mini .v.amber{color:var(--amber)}
+
+.sec-title{font-weight:600;font-size:11px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin:20px 2px 10px}
+
+/* ── buttons ── */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  font-weight:700;font-size:15px;padding:15px;border-radius:15px;border:none;
+  cursor:pointer;transition:.2s var(--ease);font-family:var(--sans);letter-spacing:-.01em;
+}
+.btn-amber{
+  background:linear-gradient(180deg,#F9AE2A,#E49000);color:#1A0E00;
+  box-shadow:0 4px 22px rgba(245,166,35,.32),0 1px 0 rgba(255,255,255,.22) inset;
+}
+.btn-amber:active{transform:scale(.98);box-shadow:0 2px 8px rgba(245,166,35,.2)}
+.btn-amber:disabled{background:var(--el);color:var(--ink3);box-shadow:none;cursor:not-allowed}
+.btn-ghost{background:rgba(255,255,255,.05);color:var(--ink);border:1px solid var(--bd2)}
+.btn-ghost:active{transform:scale(.98)}
+.btn-sm{width:auto;padding:9px 15px;font-size:13px;border-radius:12px}
+
+/* ── ledger rows ── */
+.row{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid var(--bd)}
+.row:last-child{border-bottom:none}
+.ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none;font-family:var(--mono);font-size:13px;font-weight:700}
+.ic.cr{background:var(--gs);color:var(--green)}
+.ic.dr{background:var(--rs);color:var(--red)}
+.ic.rw{background:var(--as);color:var(--amber)}
+.row .main{flex:1;min-width:0}
+.row .main .t{font-weight:500;font-size:14px}
+.row .main .s{font-size:11px;color:var(--ink3);font-family:var(--mono);margin-top:2px}
+.row .amt{font-family:var(--mono);font-weight:700;font-size:14px;text-align:right}
+.row .amt.pos{color:var(--green)} .row .amt.neg{color:var(--red)}
+.row .amt .b{display:block;font-size:10px;color:var(--ink3);font-weight:400;margin-top:2px}
+/* stagger entrance */
+#ledger .row:nth-child(1){animation:rin .38s .04s var(--ease) both}
+#ledger .row:nth-child(2){animation:rin .38s .09s var(--ease) both}
+#ledger .row:nth-child(3){animation:rin .38s .14s var(--ease) both}
+#ledger .row:nth-child(4){animation:rin .38s .19s var(--ease) both}
+#ledger .row:nth-child(5){animation:rin .38s .24s var(--ease) both}
+#ledger .row:nth-child(6){animation:rin .38s .29s var(--ease) both}
+@keyframes rin{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+
+/* ── segmented control ── */
+.seg{display:flex;gap:3px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:13px;padding:4px;margin-bottom:14px}
+.seg button{flex:1;padding:8px;border:none;background:transparent;color:var(--ink3);font-family:var(--mono);font-size:12px;font-weight:600;border-radius:10px;cursor:pointer;transition:.18s;letter-spacing:.02em}
+.seg button.on{background:var(--amber);color:#1A0E00;box-shadow:0 2px 12px rgba(245,166,35,.32)}
+
+/* ── gauge ── */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:10px 0 4px}
+#gaugeC{width:220px;height:132px}
+.gauge-val{font-family:var(--mono);font-weight:700;font-size:36px;letter-spacing:-.03em;margin-top:-26px}
+.gauge-lbl{font-size:12px;color:var(--ink2);margin-top:6px;font-family:var(--mono)}
+
+/* ── toggle ── */
+.tg-row{display:flex;align-items:center;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--bd)}
+.tg-row:last-child{border-bottom:none}
+.tg-row .tl{flex:1;min-width:0;padding-right:14px}
+.tg-row .tt{font-weight:500;font-size:14px}
+.tg-row .ts{font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.45}
+.sw{width:48px;height:28px;border-radius:20px;background:var(--el);border:1px solid var(--bd2);position:relative;cursor:pointer;flex:none;transition:.22s var(--ease)}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.3);transition:.22s var(--ease)}
+.sw.on{background:var(--amber);border-color:transparent;box-shadow:0 0 16px rgba(245,166,35,.32)}
+.sw.on::after{transform:translateX(20px)}
+.sw.lock{opacity:.45;cursor:not-allowed}
+
+/* ── inputs ── */
+.field{margin-bottom:12px}
+.field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:7px}
+.inp{display:flex;align-items:center;background:var(--el);border:1px solid var(--bd2);border-radius:13px;padding:0 14px;transition:.15s}
+.inp:focus-within{border-color:rgba(245,166,35,.45);box-shadow:0 0 0 3px rgba(245,166,35,.09)}
+.inp .pre{color:var(--ink3);font-family:var(--mono);font-size:14px}
+.inp input,.inp select{flex:1;background:transparent;border:none;outline:none;color:var(--ink);font-family:var(--mono);font-size:16px;padding:14px 8px;width:100%}
+.inp select{cursor:pointer}
+.inp input::-webkit-outer-spin-button,.inp input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* calc result */
+.calc-out{
+  background:linear-gradient(160deg,var(--s2),var(--s1));
+  border:1px solid var(--bda);border-radius:18px;padding:22px;text-align:center;margin-top:8px;
+}
+.calc-out .big{font-family:var(--mono);font-weight:700;font-size:46px;color:var(--amber);letter-spacing:-.03em;text-shadow:0 0 32px rgba(245,166,35,.38)}
+
+/* referral card */
+.refcode{display:flex;align-items:center;gap:10px;background:rgba(245,166,35,.07);border:1.5px dashed rgba(245,166,35,.28);border-radius:15px;padding:15px 17px}
+.refcode .code{flex:1;font-family:var(--mono);font-weight:700;font-size:19px;letter-spacing:.06em;color:var(--amber)}
+
+/* notes */
+.note{background:var(--rs);border:1px solid rgba(255,69,58,.26);border-radius:13px;padding:12px 15px;font-size:11.5px;color:var(--ink2);line-height:1.6}
+.note b{color:var(--ink)}
+.note.amber{background:var(--as);border-color:rgba(245,166,35,.26)}
+
+/* ── bottom tab bar ── */
+.tabs{
+  position:absolute;bottom:0;left:0;right:0;display:flex;
+  background:rgba(10,10,10,.92);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);
+  border-top:1px solid rgba(255,255,255,.1);
+  padding:8px 8px max(env(safe-area-inset-bottom),10px);z-index:30;
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;
+  background:none;border:none;cursor:pointer;color:var(--ink3);font-size:9.5px;font-weight:500;
+  transition:.2s var(--ease);font-family:var(--sans);letter-spacing:.02em;position:relative;
+}
+.tab svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.8;fill:none;transition:.2s var(--ease)}
+.tab.on{color:var(--amber)}
+.tab.on svg{filter:drop-shadow(0 0 7px rgba(245,166,35,.6))}
+.tab.on::after{
+  content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  width:24px;height:2.5px;border-radius:0 0 3px 3px;
+  background:var(--amber);box-shadow:0 0 8px var(--amber);
+}
+
+/* ── payout sheet ── */
+.sheet{position:absolute;inset:0;z-index:40;background:rgba(4,8,15,.72);backdrop-filter:blur(8px);display:none;align-items:flex-end}
+.sheet.on{display:flex;animation:sfade .22s}
+@keyframes sfade{from{opacity:0}to{opacity:1}}
+.sheet-inner{
+  width:100%;background:var(--s1);border-radius:28px 28px 0 0;
+  border-top:1px solid var(--bd2);
+  padding:8px 20px max(env(safe-area-inset-bottom),26px);
+  max-height:92%;overflow-y:auto;animation:sup .36s var(--ease);
+}
+@keyframes sup{from{transform:translateY(100%)}to{transform:none}}
+.grab{width:40px;height:4px;border-radius:3px;background:var(--bd2);margin:10px auto 20px}
+.sheet h3{font-size:21px;font-weight:700;letter-spacing:-.02em;margin-bottom:5px}
+.method{display:flex;align-items:center;gap:14px;border:1px solid var(--bd2);border-radius:16px;padding:15px;margin-bottom:10px;cursor:pointer;transition:.18s var(--ease)}
+.method.on{border-color:var(--amber);background:var(--as)}
+.method .r{width:20px;height:20px;border-radius:50%;border:2px solid var(--bd2);flex:none;transition:.18s}
+.method.on .r{border-color:var(--amber);background:radial-gradient(circle,var(--amber) 38%,transparent 43%)}
+
+/* payout success */
+.success-wrap{text-align:center;padding:22px 0 8px}
+.success-ic{
+  width:72px;height:72px;border-radius:50%;background:var(--gs);
+  border:1px solid rgba(52,208,88,.28);display:grid;place-items:center;
+  margin:0 auto 18px;animation:sic .45s var(--spring);
+}
+@keyframes sic{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-ic svg{width:30px;height:30px;stroke:var(--green);stroke-width:2.6;fill:none;
+  stroke-dasharray:36;animation:sdraw .45s .2s var(--ease) both}
+@keyframes sdraw{from{stroke-dashoffset:36}to{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="top">
+    <div class="brand"><span class="dot"></span>Rebound</div>
+    <span class="chip" id="tierChip">STANDARD · LV.3</span>
+  </div>
+
+  <div class="scroll" id="scroll">
+
+    <!-- WALLET -->
+    <section class="screen on" data-screen="wallet">
+      <div class="card hero-card">
+        <div class="k">Kifizethető egyenleg</div>
+        <div class="bal" id="balance">$0.00</div>
+        <div class="badge">● CASH · NEM TRADE-LOCKED · $20-tól</div>
+        <canvas class="spark" id="walletSpark"></canvas>
+        <div class="grid3" style="margin-top:12px">
+          <div class="mini"><div class="k">Folyó hó</div><div class="v pos">+$38.40</div></div>
+          <div class="mini"><div class="k">Összes lot</div><div class="v">206.3</div></div>
+          <div class="mini"><div class="k">Rate</div><div class="v amber">$1.20</div></div>
+        </div>
+        <button class="btn btn-amber" style="margin-top:16px" onclick="openPayout()">Kifizetés kérése →</button>
+      </div>
+      <div class="sec-title">Főkönyv · append-only</div>
+      <div class="card" id="ledger" style="padding-top:6px;padding-bottom:6px"></div>
+      <div class="note amber"><b>Tools, not tips.</b> A rebate készpénz — soha nem trade-locked. Jutalom csak broker-megerősített FTD + minősítő volumen után. A CFD/forex magas kockázattal jár.</div>
+    </section>
+
+    <!-- JOURNAL -->
+    <section class="screen" data-screen="journal">
+      <div class="seg" id="periodSeg">
+        <button class="on" data-p="7">7 nap</button>
+        <button data-p="30">30 nap</button>
+        <button data-p="90">90 nap</button>
+      </div>
+      <div class="grid2" style="margin-bottom:10px">
+        <div class="mini"><div class="k">Win rate</div><div class="v" id="jWin">58%</div></div>
+        <div class="mini"><div class="k">Átlag R:R</div><div class="v" id="jRr">1.9</div></div>
+        <div class="mini"><div class="k">Max drawdown</div><div class="v neg" id="jDd">-7.2%</div></div>
+        <div class="mini"><div class="k">Lot / időszak</div><div class="v amber" id="jLots">42.5</div></div>
+      </div>
+      <div class="card">
+        <div class="k" style="margin-bottom:12px">Equity görbe</div>
+        <canvas id="equityC" style="width:100%;height:140px;display:block"></canvas>
+      </div>
+      <div class="note" id="revenge" style="display:none;margin-bottom:12px">⚠ <b>Revenge-trading jel:</b> 3× átlag lot 24h-n belül egy veszteség után. A risk coach figyel.</div>
+      <div class="sec-title">Kötések</div>
+      <div class="card" style="padding-top:6px;padding-bottom:6px" id="trades"></div>
+    </section>
+
+    <!-- COACH -->
+    <section class="screen" data-screen="coach">
+      <div class="card" style="text-align:center">
+        <div class="k">Napi veszteség / limit</div>
+        <div class="gauge-wrap">
+          <canvas id="gaugeC"></canvas>
+          <div class="gauge-val" id="gaugeVal">42%</div>
+          <div class="gauge-lbl" id="gaugeLbl">$84 / $200 napi limit</div>
+        </div>
+      </div>
+      <div class="sec-title">Guardrailök</div>
+      <div class="card">
+        <div class="tg-row">
+          <div class="tl"><div class="tt">Napi veszteséglimit</div><div class="ts">$200 felett a kereskedés zárolva a nap végéig.</div></div>
+          <div class="sw on" data-tg></div>
+        </div>
+        <div class="tg-row">
+          <div class="tl"><div class="tt">Max lot / kötés</div><div class="ts">2.0 lot felett megerősítés kell.</div></div>
+          <div class="sw on" data-tg></div>
+        </div>
+        <div class="tg-row">
+          <div class="tl"><div class="tt">Revenge-lock</div><div class="ts">Veszteség után 15 perc cooldown. <span style="color:var(--amber);font-weight:600">BEGINNER — zárolva</span></div></div>
+          <div class="sw on lock"></div>
+        </div>
+      </div>
+      <div class="note amber">A risk coach <b>figyelmeztet, nem dönt helyetted</b>. BEGINNER szinten egyes guardrailök kötelezőek a védelmed érdekében.</div>
+    </section>
+
+    <!-- CALCULATOR -->
+    <section class="screen" data-screen="calc">
+      <div class="card">
+        <div class="field"><label>Devizapár</label><div class="inp"><select id="cPair"><option value="10">EUR/USD</option><option value="10">GBP/USD</option><option value="9.1">USD/JPY</option><option value="10">XAU/USD (arany)</option><option value="10">GBP/JPY</option></select></div></div>
+        <div class="field"><label>Számla mérete</label><div class="inp"><span class="pre">$</span><input id="cAcct" type="number" value="5000" inputmode="decimal"></div></div>
+        <div class="field"><label>Kockázat / kötés</label><div class="inp"><input id="cRisk" type="number" value="1" inputmode="decimal"><span class="pre">%</span></div></div>
+        <div class="field" style="margin-bottom:0"><label>Stop loss</label><div class="inp"><input id="cStop" type="number" value="20" inputmode="decimal"><span class="pre">pip</span></div></div>
+      </div>
+      <div class="calc-out">
+        <div class="k" style="margin-bottom:6px">Javasolt pozícióméret</div>
+        <div class="big" id="cLots">0.00 lot</div>
+        <div class="grid2" style="margin-top:14px">
+          <div class="mini" style="background:rgba(255,255,255,.02)"><div class="k">Kockáztatott</div><div class="v" id="cRiskAmt">$0</div></div>
+          <div class="mini" style="background:rgba(255,255,255,.02)"><div class="k">Rebate / kötés</div><div class="v amber" id="cReb">$0.00</div></div>
+        </div>
+      </div>
+      <div class="note amber" style="margin-top:12px">A számítás tájékoztató. A rebate-becslés $1.20/lot Standard rátán. Nem befektetési tanács.</div>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="screen" data-screen="profile">
+      <div class="card hero-card">
+        <div class="k">Hívd meg a tradertársaid</div>
+        <div style="font-size:13px;color:var(--ink2);margin:8px 0 16px;line-height:1.55">Minden qualified FTD után <b style="color:var(--amber)">$80 készpénz</b> jár — neked is, neki is.</div>
+        <div class="refcode"><span class="code" id="refCode">REBOUND-7K4F</span><button class="btn btn-amber btn-sm" id="copyBtn" onclick="copyRef()">Másol</button></div>
+        <div class="grid2" style="margin-top:12px">
+          <div class="mini" style="background:rgba(255,255,255,.03)"><div class="k">Qualified</div><div class="v pos">4</div></div>
+          <div class="mini" style="background:rgba(255,255,255,.03)"><div class="k">Függőben</div><div class="v">2</div></div>
+        </div>
+      </div>
+      <div class="sec-title">Hogyan működik</div>
+      <div class="card" style="padding-top:6px;padding-bottom:6px">
+        <div class="row"><div class="ic rw">1</div><div class="main"><div class="t">Megosztod a kódod</div><div class="s">Signup → XP, készpénz még nem</div></div></div>
+        <div class="row"><div class="ic cr">2</div><div class="main"><div class="t">A meghívott befizet (FTD)</div><div class="s">Broker megerősíti + minősítő volumen</div></div></div>
+        <div class="row"><div class="ic rw">3</div><div class="main"><div class="t">$80 készpénz — mindkettőtöknek</div><div class="s">A tárcádba, kifizethető</div></div></div>
+      </div>
+      <div class="sec-title">Fiók</div>
+      <div class="card" style="padding-top:4px;padding-bottom:4px">
+        <div class="tg-row"><div class="tt">Csatlakoztatott broker</div><span class="mono" style="color:var(--ink2);font-size:13px">IB · ****4821</span></div>
+        <div class="tg-row"><div class="tt">Hozzáférés</div><span class="mono" style="color:var(--green);font-size:13px">READ-ONLY ✓</span></div>
+        <div class="tg-row"><div class="tt">Skill szint</div><span class="mono" style="color:var(--ink2);font-size:13px">BEGINNER</span></div>
+      </div>
+      <div class="note">A Rebound kizárólag <b>read-only</b> hozzáférést használ — megbízást sosem adunk a neveden. A rebate az affiliate jutalék visszaosztása. A CFD/forex kereskedés magas kockázattal jár, tőkéd elveszítheted.</div>
+    </section>
+
+  </div><!-- /scroll -->
+
+  <!-- bottom nav -->
+  <nav class="tabs" id="tabs">
+    <button class="tab on" data-go="wallet">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M16 14.5h2"/></svg>
+      Wallet
+    </button>
+    <button class="tab" data-go="journal">
+      <svg viewBox="0 0 24 24"><polyline points="4,16 8,10 12,14 16,7 20,10"/><path d="M4 20h16" opacity=".4"/></svg>
+      Napló
+    </button>
+    <button class="tab" data-go="coach">
+      <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+      Coach
+    </button>
+    <button class="tab" data-go="calc">
+      <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8 7h8M8 11h2M12 11h2M16 11h.5M8 15h2M12 15h2M16 15h.5"/></svg>
+      Kalk
+    </button>
+    <button class="tab" data-go="profile">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.5-6 7-6s7 2 7 6"/></svg>
+      Profil
+    </button>
+  </nav>
+
+  <!-- payout sheet -->
+  <div class="sheet" id="payoutSheet">
+    <div class="sheet-inner">
+      <div class="grab"></div>
+      <div id="poStep1">
+        <h3>Kifizetés kérése</h3>
+        <p style="color:var(--ink2);font-size:13px;margin-bottom:18px">Elérhető: <b class="mono" style="color:var(--amber)">$247.60</b> · min. $20</p>
+        <div class="field"><label>Összeg</label><div class="inp"><span class="pre">$</span><input id="poAmt" type="number" value="247.60" inputmode="decimal"></div></div>
+        <label style="display:block;font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Módszer</label>
+        <div class="method on" data-method="USDC" onclick="pickMethod(this)">
+          <div class="r"></div>
+          <div><div style="font-weight:600;font-size:14px">USDC · BEP-20</div><div style="font-size:11px;color:var(--ink3)">~2 perc · 0 díj</div></div>
+        </div>
+        <div class="method" data-method="BANK" onclick="pickMethod(this)">
+          <div class="r"></div>
+          <div><div style="font-weight:600;font-size:14px">Banki átutalás (SEPA)</div><div style="font-size:11px;color:var(--ink3)">1–2 munkanap</div></div>
+        </div>
+        <div class="field" style="margin-top:8px"><label>Cél cím / IBAN</label><div class="inp"><input id="poDest" placeholder="0x…" value=""></div></div>
+        <button class="btn btn-amber" onclick="poConfirm()">Tovább →</button>
+        <button class="btn btn-ghost" style="margin-top:8px" onclick="closePayout()">Mégse</button>
+      </div>
+      <div id="poStep2" style="display:none">
+        <div class="success-wrap">
+          <div class="success-ic">
+            <svg viewBox="0 0 24 24"><polyline points="4,12 9,17 20,6"/></svg>
+          </div>
+          <h3 style="text-align:center">Kérés rögzítve</h3>
+          <p style="color:var(--ink2);font-size:13px;margin:10px 0 3px"><span id="poSummary"></span></p>
+          <p class="mono" style="color:var(--ink3);font-size:11px;margin-bottom:22px">Státusz: PENDING · admin jóváhagyás · TX hash a History-ban</p>
+          <button class="btn btn-amber" onclick="closePayout()">Rendben</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ── tab nav ──
+const tabsEl=document.getElementById('tabs'),scrollEl=document.getElementById('scroll');
+tabsEl.addEventListener('click',e=>{
+  const b=e.target.closest('.tab');if(!b)return;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t===b));
+  const go=b.dataset.go;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.dataset.screen===go));
+  scrollEl.scrollTo({top:0,behavior:'instant'});
+  if(go==='journal')drawEquity();
+  if(go==='coach'){gaugeDrawn=false;drawGauge();}
+});
+
+// ── easeOutBack count-up ──
+function eob(t){const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);}
+(function(){
+  const el=document.getElementById('balance'),tgt=247.60,st=performance.now();
+  (function tk(n){
+    const p=Math.min(1,(n-st)/1500),v=tgt*Math.max(0,eob(p));
+    el.textContent='$'+v.toFixed(2);
+    if(p<1)requestAnimationFrame(tk);else el.textContent='$247.60';
+  })(st);
+})();
+
+// ── ledger ──
+const LED=[
+  ['cr','REBATE','EURUSD · 2.4 lot','+$2.88','$247.60'],
+  ['cr','REBATE','XAUUSD · 1.0 lot','+$1.60','$244.72'],
+  ['rw','REWARD','Welcome (FTD megerősítve)','+$100.00','$243.12'],
+  ['cr','REBATE','GBPUSD · 5.1 lot','+$6.12','$143.12'],
+  ['dr','PAYOUT','USDC kifizetés · 0xa1…c4','-$80.00','$136.99'],
+  ['cr','REBATE','US30 · 3.0 lot','+$4.80','$216.99'],
+];
+document.getElementById('ledger').innerHTML=LED.map(r=>`<div class="row"><div class="ic ${r[0]}">${r[0]==='dr'?'↑':'↓'}</div><div class="main"><div class="t">${r[1]}</div><div class="s">${r[2]}</div></div><div class="amt ${r[3][0]==='-'?'neg':'pos'}">${r[3]}<span class="b">→ ${r[4]}</span></div></div>`).join('');
+
+// ── sparkline — animated draw ──
+function drawSpark(c,pts,col){
+  const x=c.getContext('2d'),dpr=devicePixelRatio||1,W=c.clientWidth||300,H=c.clientHeight||56;
+  c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);
+  const frame=prog=>{
+    x.clearRect(0,0,W,H);
+    const cnt=Math.max(2,Math.ceil(pts.length*prog));
+    x.strokeStyle=col;x.lineWidth=2.4;x.lineJoin='round';x.lineCap='round';
+    x.shadowColor=col;x.shadowBlur=10;x.beginPath();
+    for(let i=0;i<cnt;i++){const px=i/(pts.length-1)*W,py=H-(pts[i]*(H-8)+4);i?x.lineTo(px,py):x.moveTo(px,py);}
+    x.stroke();x.shadowBlur=0;
+    const lx=(cnt-1)/(pts.length-1)*W,ly=H-(pts[cnt-1]*(H-8)+4);
+    x.lineTo(lx,H);x.lineTo(0,H);x.closePath();
+    const g=x.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'rgba(245,166,35,.22)');g.addColorStop(1,'rgba(245,166,35,0)');
+    x.fillStyle=g;x.fill();
+    if(prog>=1){x.shadowColor='rgba(255,200,80,1)';x.shadowBlur=18;x.fillStyle='#FFB94D';x.beginPath();x.arc(lx,ly,3.8,0,7);x.fill();}
+  };
+  const st=performance.now();
+  (function tick(n){const p=Math.min(1,(n-st)/920);frame(p);if(p<1)requestAnimationFrame(tick);})(st);
+}
+requestAnimationFrame(()=>drawSpark(document.getElementById('walletSpark'),[.3,.38,.34,.5,.46,.58,.55,.7,.66,.82],'#F5A623'));
+
+// ── journal ──
+const PERIOD={
+  7:{win:'58%',rr:'1.9',dd:'-7.2%',lots:'42.5',rev:false},
+  30:{win:'54%',rr:'1.7',dd:'-11.4%',lots:'168.2',rev:true},
+  90:{win:'56%',rr:'1.8',dd:'-13.0%',lots:'511.7',rev:true}
+};
+document.getElementById('periodSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('#periodSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  const d=PERIOD[+b.dataset.p];
+  document.getElementById('jWin').textContent=d.win;
+  document.getElementById('jRr').textContent=d.rr;
+  document.getElementById('jDd').textContent=d.dd;
+  document.getElementById('jLots').textContent=d.lots;
+  document.getElementById('revenge').style.display=d.rev?'block':'none';
+  equityDrawn=false;drawEquity();
+});
+
+document.getElementById('trades').innerHTML=[
+  ['EURUSD','B','2.4','+$96','+$2.88'],
+  ['XAUUSD','S','1.0','-$32','+$1.60'],
+  ['GBPUSD','B','5.1','+$180','+$6.12'],
+  ['US30','B','3.0','+$74','+$4.80'],
+  ['USDJPY','S','1.5','-$45','+$1.80']
+].map(t=>`<div class="row"><div class="ic ${t[3][0]==='+'?'cr':'dr'}">${t[1]}</div><div class="main"><div class="t">${t[0]} · ${t[2]} lot</div><div class="s">P&L ${t[3]}</div></div><div class="amt pos">${t[4]}<span class="b">rebate</span></div></div>`).join('');
+
+let equityDrawn=false;
+function drawEquity(){
+  const c=document.getElementById('equityC');if(!c||equityDrawn)return;equityDrawn=true;
+  const x=c.getContext('2d'),dpr=devicePixelRatio||1,W=c.clientWidth||300,H=c.clientHeight||140;
+  c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);
+  const d=[.2,.28,.24,.35,.3,.42,.38,.52,.48,.6,.57,.72,.68,.8];
+  const frame=prog=>{
+    x.clearRect(0,0,W,H);
+    x.strokeStyle='rgba(245,166,35,.07)';x.lineWidth=1;
+    for(let i=0;i<4;i++){x.beginPath();x.moveTo(0,H*i/3);x.lineTo(W,H*i/3);x.stroke();}
+    const cnt=Math.max(2,Math.ceil(d.length*prog));
+    x.strokeStyle='#F5A623';x.lineWidth=2.4;x.lineJoin='round';
+    x.shadowColor='rgba(245,166,35,.55)';x.shadowBlur=10;x.beginPath();
+    for(let i=0;i<cnt;i++){const px=i/(d.length-1)*W,py=H-(d[i]*(H-14)+7);i?x.lineTo(px,py):x.moveTo(px,py);}
+    x.stroke();x.shadowBlur=0;
+    const lx=(cnt-1)/(d.length-1)*W;
+    x.lineTo(lx,H);x.lineTo(0,H);x.closePath();
+    const g=x.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'rgba(245,166,35,.2)');g.addColorStop(1,'rgba(245,166,35,.01)');
+    x.fillStyle=g;x.fill();
+  };
+  const st=performance.now();
+  (function tick(n){const p=Math.min(1,(n-st)/980);frame(p);if(p<1)requestAnimationFrame(tick);})(st);
+}
+
+// ── coach gauge — animated with zones ──
+let gaugeDrawn=false;
+function drawGauge(){
+  const c=document.getElementById('gaugeC');if(!c||gaugeDrawn)return;gaugeDrawn=true;
+  const x=c.getContext('2d'),dpr=devicePixelRatio||1,W=220,H=132;
+  c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);
+  const cx=W/2,cy=H+4,r=90,pct=.42;
+  const col=pct>.85?'#FF453A':pct>.7?'#F5A623':'#34D058';
+  document.getElementById('gaugeVal').style.color=col;
+  const draw=prog=>{
+    x.clearRect(0,0,W,H);
+    x.lineWidth=13;x.lineCap='round';
+    // bg track
+    x.strokeStyle='rgba(255,255,255,.06)';x.beginPath();x.arc(cx,cy,r,Math.PI,0);x.stroke();
+    // zone markers
+    x.lineWidth=13;
+    x.strokeStyle='rgba(52,208,88,.18)';x.beginPath();x.arc(cx,cy,r,Math.PI,Math.PI*1.6);x.stroke();
+    x.strokeStyle='rgba(245,166,35,.15)';x.beginPath();x.arc(cx,cy,r,Math.PI*1.6,Math.PI*1.85);x.stroke();
+    x.strokeStyle='rgba(255,69,58,.15)';x.beginPath();x.arc(cx,cy,r,Math.PI*1.85,0);x.stroke();
+    // value arc
+    x.strokeStyle=col;x.shadowColor=col;x.shadowBlur=16;
+    x.beginPath();x.arc(cx,cy,r,Math.PI,Math.PI*(1+pct*prog));x.stroke();x.shadowBlur=0;
+    // tip dot
+    const ang=Math.PI*(1+pct*prog);
+    const dx=cx+r*Math.cos(ang),dy=cy+r*Math.sin(ang);
+    x.fillStyle=col;x.shadowColor=col;x.shadowBlur=12;
+    x.beginPath();x.arc(dx,dy,6.5,0,7);x.fill();x.shadowBlur=0;
+  };
+  const st=performance.now();
+  (function tick(n){const p=Math.min(1,(n-st)/1100);const e=1-Math.pow(1-p,3);draw(e);if(p<1)requestAnimationFrame(tick);})(st);
+}
+
+// ── toggles ──
+document.querySelectorAll('.sw[data-tg]').forEach(s=>s.addEventListener('click',()=>s.classList.toggle('on')));
+
+// ── calculator ──
+function calc(){
+  const pip=parseFloat(document.getElementById('cPair').value)||10;
+  const acct=parseFloat(document.getElementById('cAcct').value)||0;
+  const risk=parseFloat(document.getElementById('cRisk').value)||0;
+  const stop=parseFloat(document.getElementById('cStop').value)||0;
+  const rAmt=acct*risk/100,lots=stop>0?rAmt/(stop*pip):0;
+  document.getElementById('cLots').textContent=lots.toFixed(2)+' lot';
+  document.getElementById('cRiskAmt').textContent='$'+rAmt.toFixed(0);
+  document.getElementById('cReb').textContent='$'+(lots*1.20).toFixed(2);
+}
+['cPair','cAcct','cRisk','cStop'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',calc);el.addEventListener('change',calc);
+});
+calc();
+
+// ── referral copy ──
+function copyRef(){
+  const t=document.getElementById('refCode').textContent,b=document.getElementById('copyBtn');
+  const done=()=>{b.textContent='Másolva ✓';setTimeout(()=>b.textContent='Másol',1600);};
+  if(navigator.clipboard)navigator.clipboard.writeText(t).then(done).catch(done);else done();
+}
+
+// ── payout ──
+let poMethod='USDC';
+function openPayout(){
+  document.getElementById('payoutSheet').classList.add('on');
+  document.getElementById('poStep1').style.display='block';
+  document.getElementById('poStep2').style.display='none';
+}
+function closePayout(){document.getElementById('payoutSheet').classList.remove('on');}
+function pickMethod(el){
+  document.querySelectorAll('.method').forEach(m=>m.classList.toggle('on',m===el));
+  poMethod=el.dataset.method;
+  document.getElementById('poDest').placeholder=poMethod==='USDC'?'0x…':'HU.. IBAN';
+}
+function poConfirm(){
+  const amt=parseFloat(document.getElementById('poAmt').value)||0;
+  if(amt<20){alert('A minimum kifizetés $20.');return;}
+  document.getElementById('poSummary').textContent='$'+amt.toFixed(2)+' · '+(poMethod==='USDC'?'USDC BEP-20':'SEPA átutalás');
+  document.getElementById('poStep1').style.display='none';
+  document.getElementById('poStep2').style.display='block';
+}
+</script>
+</body>
+</html>
